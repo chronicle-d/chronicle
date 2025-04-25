@@ -1,0 +1,29 @@
+#ifndef CHRONICLE_ERROR_HANDLER_HPP
+#define CHRONICLE_ERROR_HANDLER_HPP
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
+std::string getErrorMsg(int internal_exit_code);
+
+class ChronicleException : public std::runtime_error {
+public:
+    ChronicleException(int code, const std::string& message = "");
+    ChronicleException(int code, const std::string& message, const std::string& subMessage);
+
+    int getCode() const { return code; }
+    std::string getSubMessage() const { return sub_message_; }
+    // We can keep getDetailedInfo if you find it useful elsewhere
+    std::string getDetailedInfo() const;
+
+private:
+    int code;
+    std::string sub_message_;
+};
+
+void throwChronicleException(int internal_exit_code, const std::string& sub_message = "");
+
+void chronicleAssert(bool statement, int internal_exit_code = 109, const std::string& sub_message = "");
+
+#endif // CHRONICLE_ERROR_HANDLER_HPP
