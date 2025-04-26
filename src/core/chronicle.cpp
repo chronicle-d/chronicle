@@ -1,6 +1,6 @@
 #include "core/chronicle.hpp"
 
-std::vector<std::string> getDirContents(std::string unit_name, std::string dir_path, connectionInfo ci) {
+std::vector<std::string> getDirContents(std::string dir_path, connectionInfo ci) {
     Ssh ssh;
 
     if (!(&chronicleConfig)) {

@@ -3,7 +3,7 @@
 std::string getErrorMsg(int internal_exit_code) {
     switch (internal_exit_code) {
         case 100: return "Unknown core level error";
-        case 101: return "No password provided";
+        case 101: return "Configuration error";
         case 102: return "No user provided";
         case 103: return "No host provided";
         case 104: return "Could not connect to host";
@@ -14,23 +14,25 @@ std::string getErrorMsg(int internal_exit_code) {
         case 109: return "Assertion failed, core level error";
         case 110: return "Failed creating an SSH session";
         case 111: return "Unknown ssh error";
+        case 112: return "No such section in configuration file";
         default: return "Unknown error.";
     }
 }
 
 ChronicleException::ChronicleException(int code, const std::string& message)
-    : std::runtime_error(message), code(code), sub_message_("") {}
+    : std::runtime_error(message), code(code), sub_message_("") 
+{
+    full_message_ = message; // Only main message
+}
 
 ChronicleException::ChronicleException(int code, const std::string& message, const std::string& subMessage)
-    : std::runtime_error(message), code(code), sub_message_(subMessage) {}
-
-std::string ChronicleException::getDetailedInfo() const {
-    std::stringstream ss;
-    ss << getErrorMsg(code);
+    : std::runtime_error(message), code(code), sub_message_(subMessage) 
+{
     if (!sub_message_.empty()) {
-        ss << " -> " << sub_message_;
+        full_message_ = message + " -> " + sub_message_;
+    } else {
+        full_message_ = message;
     }
-    return ss.str();
 }
 
 // Implementation of the function to throw the exception

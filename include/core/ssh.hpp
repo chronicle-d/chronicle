@@ -21,7 +21,6 @@ class Ssh {
         int executeCommand(const char *command, ssh_session session, std::vector<std::string> &output_lines);
     private:
         std::string verifyKnownHost(ssh_session session);
-        inline std::string safeSshError(ssh_session session);
 };
 
 #endif // CHRONICLE_SSH_H

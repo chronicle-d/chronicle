@@ -8,19 +8,18 @@
 std::string getErrorMsg(int internal_exit_code);
 
 class ChronicleException : public std::runtime_error {
-public:
-    ChronicleException(int code, const std::string& message = "");
-    ChronicleException(int code, const std::string& message, const std::string& subMessage);
-
-    int getCode() const { return code; }
-    std::string getSubMessage() const { return sub_message_; }
-    // We can keep getDetailedInfo if you find it useful elsewhere
-    std::string getDetailedInfo() const;
-
-private:
-    int code;
-    std::string sub_message_;
-};
+    public:
+        ChronicleException(int code, const std::string& message);
+        ChronicleException(int code, const std::string& message, const std::string& subMessage);
+    
+        int getCode() const { return code; }
+        const char* what() const noexcept override { return full_message_.c_str(); }
+    
+    private:
+        int code;
+        std::string sub_message_;
+        std::string full_message_;
+};    
 
 void throwChronicleException(int internal_exit_code, const std::string& sub_message = "");
 

@@ -3,14 +3,8 @@
 #include "core/chronicle.hpp"
 #include "core/error_handler.hpp"
 
-inline std::string Ssh::safeSshError(ssh_session session) {
-    const char* err = ssh_get_error(session);
-    return err ? std::string(err) : "Unknown SSH error";
-}
-
 ssh_session Ssh::startSession(connectionInfo ci) {
     ssh_session session;
-    int verbosity = SSH_LOG_NOLOG;
 
     session = ssh_new();
     if (session == NULL) {
@@ -18,13 +12,15 @@ ssh_session Ssh::startSession(connectionInfo ci) {
     }
 
     ssh_options_set(session, SSH_OPTIONS_HOST, ci.host.c_str());
-    ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
+    ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &ci.verbosity);
     ssh_options_set(session, SSH_OPTIONS_PORT, &ci.port);
+    ssh_options_set(session, SSH_OPTIONS_KEY_EXCHANGE, ci.kex_methods.c_str());
+    ssh_options_set(session, SSH_OPTIONS_HOSTKEYS, ci.hostkey_algorithms.c_str());
 
     int rc = ssh_connect(session);
     if (rc != SSH_OK)
     {
-      throwChronicleException(104, safeSshError(session));
+      throwChronicleException(104, ssh_get_error(session));
     }
 
     std::string known_host_msg = verifyKnownHost(session);
@@ -36,7 +32,7 @@ ssh_session Ssh::startSession(connectionInfo ci) {
     rc = ssh_userauth_password(session, ci.user.c_str(), ci.password.c_str());
     if (rc != SSH_AUTH_SUCCESS) {
         endSession(session);
-        throwChronicleException(110, safeSshError(session));
+        throwChronicleException(110, ssh_get_error(session));
     }
 
     return session;
@@ -138,7 +134,7 @@ std::string Ssh::verifyKnownHost(ssh_session session) {
             break;
         case SSH_KNOWN_HOSTS_ERROR:
             ssh_clean_pubkey_hash(&hash);
-            return safeSshError(session);
+            return ssh_get_error(session);
     }
  
     ssh_clean_pubkey_hash(&hash);
