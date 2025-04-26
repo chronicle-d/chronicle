@@ -7,14 +7,14 @@ def main():
     try:
         ci = chronicle.getConnectionInfo(unit)
 
-        dir_items = chronicle.getDirContents("/home/", ci)
+        dir_items = chronicle.getConfig(ci)
 
-        print(f"Directory contents for unit '{unit}':")
+        print(f"Configuration of '{unit}':")
         for item in dir_items:
             print(f"- {item}")
 
     except Exception as e:
-        print(f"[ERROR] Could not get directory contents for device '{unit}': {e}")
+        print(f"[ERROR]{e}")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,5 @@
+{
+    "operations": {
+        "readConfig": "enable\nshow running config"
+    }
+}

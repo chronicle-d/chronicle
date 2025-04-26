@@ -8,7 +8,7 @@ ssh_session Ssh::startSession(connectionInfo ci) {
 
     session = ssh_new();
     if (session == NULL) {
-        throwChronicleException(110);
+        throwChronicleException(110,"Ssh::startSession",ssh_get_error(session));
     }
 
     ssh_options_set(session, SSH_OPTIONS_HOST, ci.host.c_str());
@@ -20,19 +20,19 @@ ssh_session Ssh::startSession(connectionInfo ci) {
     int rc = ssh_connect(session);
     if (rc != SSH_OK)
     {
-      throwChronicleException(104, ssh_get_error(session));
+      throwChronicleException(104,"Ssh::startSession",ssh_get_error(session));
     }
 
     std::string known_host_msg = verifyKnownHost(session);
     if (known_host_msg.size() > 0) {
         endSession(session);
-        throwChronicleException(110, known_host_msg);
+        throwChronicleException(110,"Ssh::startSession",known_host_msg);
     }
 
     rc = ssh_userauth_password(session, ci.user.c_str(), ci.password.c_str());
     if (rc != SSH_AUTH_SUCCESS) {
         endSession(session);
-        throwChronicleException(110, ssh_get_error(session));
+        throwChronicleException(110,"Ssh::startSession",ssh_get_error(session));
     }
 
     return session;
@@ -49,22 +49,27 @@ int Ssh::executeCommand(const char *command, ssh_session session, std::vector<st
     char buffer[256];
     int nbytes;
     std::string total_output;
+
+    if (!ssh_is_connected(session)) {
+        endSession(session);
+        throwChronicleException(111, "Ssh::executeCommand", "SSH session died before executing command: `" + std::string(command) + "`");
+    }
    
     channel = ssh_channel_new(session);
     if (channel == NULL)
-        throwChronicleException(110, "Failed to create SSH channel.");
+        throwChronicleException(110,"Ssh::executeCommand",ssh_get_error(session));
    
     rc = ssh_channel_open_session(channel);
     if (rc != SSH_OK) {
       ssh_channel_free(channel);
-      return rc;
+      throwChronicleException(110,"Ssh::executeCommand",ssh_get_error(session));
     }
    
     rc = ssh_channel_request_exec(channel, command);
     if (rc != SSH_OK) {
       ssh_channel_close(channel);
       ssh_channel_free(channel);
-      return rc;
+      throwChronicleException(110,"Ssh::executeCommand",ssh_get_error(session));
     }
    
     while ((nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0)) > 0) {
@@ -74,7 +79,7 @@ int Ssh::executeCommand(const char *command, ssh_session session, std::vector<st
     if (nbytes < 0) {
         ssh_channel_close(channel);
         ssh_channel_free(channel);
-        throwChronicleException(110, "Error reading SSH output.");
+        throwChronicleException(110,"Ssh::executeCommand",ssh_get_error(session));
     }
    
     int remote_exit_code = ssh_channel_get_exit_status(channel);

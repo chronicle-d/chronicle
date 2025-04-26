@@ -8,21 +8,21 @@
 std::string getErrorMsg(int internal_exit_code);
 
 class ChronicleException : public std::runtime_error {
-    public:
-        ChronicleException(int code, const std::string& message);
-        ChronicleException(int code, const std::string& message, const std::string& subMessage);
-    
-        int getCode() const { return code; }
-        const char* what() const noexcept override { return full_message_.c_str(); }
-    
-    private:
-        int code;
-        std::string sub_message_;
-        std::string full_message_;
-};    
+public:
+    ChronicleException(int code, const std::string& message, const std::string& function = "", const std::string& details = "");
 
-void throwChronicleException(int internal_exit_code, const std::string& sub_message = "");
+    int getCode() const { return code_; }
+    const char* what() const noexcept override { return full_message_.c_str(); }
+    
+private:
+    int code_;
+    std::string function_name_;
+    std::string details_;
+    std::string full_message_;
+};
 
-void chronicleAssert(bool statement, int internal_exit_code = 109, const std::string& sub_message = "");
+void throwChronicleException(int internal_exit_code, const std::string& function = "", const std::string& details = "");
+
+void chronicleAssert(bool statement, int internal_exit_code = 109, const std::string& function = "", const std::string& details = "");
 
 #endif // CHRONICLE_ERROR_HANDLER_HPP

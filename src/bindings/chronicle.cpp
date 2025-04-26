@@ -38,5 +38,5 @@ PYBIND11_MODULE(chronicle, m) {
         .def_readwrite("verbosity", &connectionInfo::verbosity);
 
     // Chronicle
-    m.def("getDirContents", &getDirContents, "Gets the directory contents of a give directory in a given unit.");
+    m.def("getConfig", &getConfig, "Returns the current device configuration.");
 }

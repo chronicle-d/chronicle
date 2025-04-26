@@ -15,33 +15,32 @@ std::string getErrorMsg(int internal_exit_code) {
         case 110: return "Failed creating an SSH session";
         case 111: return "Unknown ssh error";
         case 112: return "No such section in configuration file";
+        case 113: return "Reomte error";
         default: return "Unknown error.";
     }
 }
 
-ChronicleException::ChronicleException(int code, const std::string& message)
-    : std::runtime_error(message), code(code), sub_message_("") 
+ChronicleException::ChronicleException(int code, const std::string& message, const std::string& function, const std::string& details)
+    : std::runtime_error(message), code_(code), function_name_(function), details_(details)
 {
-    full_message_ = message; // Only main message
-}
-
-ChronicleException::ChronicleException(int code, const std::string& message, const std::string& subMessage)
-    : std::runtime_error(message), code(code), sub_message_(subMessage) 
-{
-    if (!sub_message_.empty()) {
-        full_message_ = message + " -> " + sub_message_;
-    } else {
-        full_message_ = message;
+    std::ostringstream oss;
+    oss << "[ChronicleError: " << code_ << "]";
+    if (!function_name_.empty()) {
+        oss << "[" << function_name_ << "] ";
     }
+    oss << message;
+    if (!details_.empty()) {
+        oss << " => " << details_;
+    }
+    full_message_ = oss.str();
 }
 
-// Implementation of the function to throw the exception
-void throwChronicleException(int internal_exit_code, const std::string& sub_message) {
-    throw ChronicleException(internal_exit_code, getErrorMsg(internal_exit_code), sub_message);
+void throwChronicleException(int internal_exit_code, const std::string& function, const std::string& details) {
+    throw ChronicleException(internal_exit_code, getErrorMsg(internal_exit_code), function, details);
 }
 
-void chronicleAssert(bool statement, int internal_exit_code, const std::string& sub_message) {
+void chronicleAssert(bool statement, int internal_exit_code, const std::string& function, const std::string& details) {
     if (!statement) {
-        throwChronicleException(internal_exit_code, sub_message);
+        throwChronicleException(internal_exit_code, function, details);
     }
 }
