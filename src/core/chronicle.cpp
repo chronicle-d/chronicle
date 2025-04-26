@@ -12,7 +12,7 @@ std::vector<std::string> getConfig(connectionInfo ci) {
         int rc = ssh.executeCommand(cmd.c_str(), session, output);
         if (rc != 0) {
             ssh.endSession(session);
-            throwChronicleException(113,"getConfig","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
+            throwChronicleException(201,"getConfig","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
         }
     }
 
@@ -32,7 +32,7 @@ std::vector<std::string> getInterfaces(connectionInfo ci) {
         int rc = ssh.executeCommand(cmd.c_str(), session, output);
         if (rc != 0) {
             ssh.endSession(session);
-            throwChronicleException(113,"getInterfaces","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
+            throwChronicleException(201,"getInterfaces","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
         }
     }
 

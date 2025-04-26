@@ -7,7 +7,7 @@ console = Console()
 
 def main():
     try:
-        chronicle.readChronicleConfig("/etc/chronicle/error.ini")
+        chronicle.readChronicleConfig("/etc/chronicle/chronicle.ini")
 
         unit = Prompt.ask("[bold cyan][GET][/bold cyan] Which device do you want to use?")
         operation = Prompt.ask("[bold cyan][GET][/bold cyan] What operation would you like to perform?")

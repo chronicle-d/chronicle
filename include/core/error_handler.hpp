@@ -5,7 +5,16 @@
 #include <string>
 #include <sstream>
 
-std::string getErrorMsg(int internal_exit_code);
+/*
+    Error codes:
+    ------------
+    1XX:            Internal core error. (within C++)
+    2XX:            SSH error.
+    3xx:            Device factory error.
+    1xxxx:          Configuration error
+
+*/
+std::string getErrorMsg(int internal_exit_code = 100);
 
 class ChronicleException : public std::runtime_error {
 public:
@@ -21,8 +30,8 @@ private:
     std::string full_message_;
 };
 
-void throwChronicleException(int internal_exit_code, const std::string& function = "", const std::string& details = "");
+void throwChronicleException(int internal_exit_code = 100, const std::string& function = "", const std::string& details = "");
 
-void chronicleAssert(bool statement, int internal_exit_code = 109, const std::string& function = "", const std::string& details = "");
+void chronicleAssert(bool statement, int internal_exit_code = 101, const std::string& function = "", const std::string& details = "");
 
 #endif // CHRONICLE_ERROR_HANDLER_HPP

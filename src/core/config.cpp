@@ -7,9 +7,9 @@ int readChronicleConfig(std::string config_path) {
     int parse_error = chronicleConfig.ParseError();
 
     if (parse_error < 0) {
-        throwChronicleException(106, "readChronicleConfig", "(file: " + config_path + ")");
+        throwChronicleException(10003, "readChronicleConfig", "(file: " + config_path + ")");
     } else if (parse_error > 0) {
-        throwChronicleException(107, "readChronicleConfig", "(file: " + config_path + ")");
+        throwChronicleException(10001, "readChronicleConfig", "(file: " + config_path + ")");
     } else {
         return 0;
     }
@@ -28,7 +28,7 @@ int connectionInfo::getVendorId(std::string vendor_name) {
 }
 
 int connectionInfo::getDeviceId(int vendor_id, std::string device_name) {
-    chronicleAssert(vendor_id > 0, 109, "connectionInfo::getDeviceId", "No vendor ID found for " + device_name);
+    chronicleAssert(vendor_id > 0, 10000, "connectionInfo::getDeviceId", "No vendor ID found for " + device_name);
 
     switch (vendor_id) {
         case CISCO_ID: {
@@ -52,22 +52,45 @@ int connectionInfo::getDeviceId(int vendor_id, std::string device_name) {
 }
 
 connectionInfo getConnectionInfo(std::string section) {
-    if (!chronicleConfig.HasSection(section)) throwChronicleException(112,"getConnectionInfo","(" + section + ")");
+    if (!chronicleConfig.HasSection(section)) throwChronicleException(10002,"getConnectionInfo","(" + section + ")");
     connectionInfo ci;
-    int vendor_id = ci.getVendorId(chronicleConfig.Get(section, "Vendor", "UNKNOWN"));
-        chronicleAssert(vendor_id > 0, 101,
-            "connectionInfo::getDeviceId", "Vendor ID not found for " + chronicleConfig.Get(section, "Vendor", "UNKNOWN") + " (DEVICE: " + section +")");
-    int device_id = ci.getDeviceId(vendor_id, chronicleConfig.Get(section, "DeviceName", "UNKNOWN"));
-        chronicleAssert(device_id > 0, 101,
-            "connectionInfo::getDeviceId", "Device ID not found for " + chronicleConfig.Get(section, "DeviceName", "UNKNOWN") + " (DEVICE: " + section +")");
+
+    /* sanitize */
+    int vendor_id = ci.getVendorId(chronicleConfig.Get(section, "Vendor", ""));
+        chronicleAssert(vendor_id > 0, 10000, "connectionInfo::getDeviceId",
+            "Vendor ID not found for vendor `" + chronicleConfig.Get(section, "Vendor", "") + "` (DEVICE: " + section +")");
+
+    int device_id = ci.getDeviceId(vendor_id, chronicleConfig.Get(section, "DeviceName", ""));
+        chronicleAssert(device_id > 0, 10000, "connectionInfo::getDeviceId",
+            "Device ID not found for device `" + chronicleConfig.Get(section, "DeviceName", "") + "` (DEVICE: " + section +")");
+
     int verbosity = chronicleConfig.GetInteger(section, "SshVerbosity", CHRONICLE_CONFIG_DEFUALT_VERBOSITY);
-        chronicleAssert(4 >= verbosity && verbosity >= 0, 101, "connectionInfo::getDeviceId", "SshVerbosity can only be between 0-4 (DEVICE: " + section +")");
+        chronicleAssert(4 >= verbosity && verbosity >= 0, 10000, "connectionInfo::getDeviceId",
+            "SshVerbosity can only be between 0-4 (CURRENT VALUE: " + std::to_string(verbosity) + " DEVICE: " + section +")");
+
+    std::string user = chronicleConfig.Get(section, "User", CHRONICLE_CONFIG_DEFUALT_USER);
+        chronicleAssert(!user.empty(), 10000, "connectionInfo::getDeviceId",
+            "No User provided (DEVICE: " + section +")");
+
+    std::string password = chronicleConfig.Get(section, "Password", "");
+        chronicleAssert(!password.empty(), 10000, "connectionInfo::getDeviceId",
+            "No Password provided (DEVICE: " + section +")");
+
+    std::string host = chronicleConfig.Get(section, "Host", "");
+        chronicleAssert(!host.empty(), 10000, "connectionInfo::getDeviceId",
+            "No Host provided (DEVICE: " + section +")");
+
+    int port = chronicleConfig.GetInteger(section, "Port", CHRONICLE_CONFIG_DEFUALT_PORT);
+        chronicleAssert(port > 0, 10000, "connectionInfo::getDeviceId",
+            "Port numbers can only be positive (CURRENT VALUE: " + std::to_string(port) + " DEVICE: " + section +")");
+
+    /* initiate */
     ci.vendor =                 vendor_id;
     ci.device =                 device_id;
-    ci.user =                   chronicleConfig.Get(section, "User", CHRONICLE_CONFIG_DEFUALT_USER);
-    ci.password =               chronicleConfig.Get(section, "Password", "UNKNOWN");
-    ci.host =                   chronicleConfig.Get(section, "Host", "UNKNOWN");
-    ci.port =                   chronicleConfig.GetInteger(section, "Port", CHRONICLE_CONFIG_DEFUALT_PORT);
+    ci.user =                   user;
+    ci.password =               password;
+    ci.host =                   host;
+    ci.port =                   port;
     ci.kex_methods =            chronicleConfig.Get(section, "KexMethods", CHRONICLE_CONFIG_DEFUALT_KEX_METHODS);
     ci.hostkey_algorithms =     chronicleConfig.Get(section, "HostKeyAlgorithms", CHRONICLE_CONFIG_DEFUALT_HOSTKEYS);
     ci.verbosity =              verbosity;

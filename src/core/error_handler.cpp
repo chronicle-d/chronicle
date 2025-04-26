@@ -2,21 +2,24 @@
 
 std::string getErrorMsg(int internal_exit_code) {
     switch (internal_exit_code) {
+        // Internal errors
         case 100: return "Unknown core level error";
-        case 101: return "Configuration error";
-        case 102: return "No user provided";
-        case 103: return "No host provided";
-        case 104: return "Could not connect to host";
-        case 105: return "Wrong credentials";
-        case 106: return "Can't load INI file (missing?)";
-        case 107: return "Parse error, please check your .ini file";
-        case 108: return "NX config, use chronicleConfig first";
-        case 109: return "Assertion failed, core level error";
-        case 110: return "Failed creating an SSH session";
-        case 111: return "Unknown ssh error";
-        case 112: return "No such section in configuration file";
-        case 113: return "Reomte error";
-        case 114: return "Error while getting device operations";
+        case 101: return "Assertion failed, core level error";
+
+        // SSH errors
+        case 200: return "Unknown ssh error";
+        case 201: return "Connection closed by remote";
+        case 202: return "Failed creating an SSH session";
+        case 203: return "Could not connect to host";
+
+        // Device factory
+        case 300: return "Error while getting device operations";
+
+        // Configuration errors
+        case 10000: return "Configuration error";
+        case 10001: return "Parse error, please check your .ini file";
+        case 10002: return "No such section in configuration file";
+        case 10003: return "Can't load INI file (missing?)";
         default: return "Unknown error.";
     }
 }
