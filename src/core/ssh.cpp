@@ -52,7 +52,7 @@ int Ssh::executeCommand(const char *command, ssh_session session, std::vector<st
 
     if (!ssh_is_connected(session)) {
         endSession(session);
-        throwChronicleException(111, "Ssh::executeCommand", "SSH session died before executing command: `" + std::string(command) + "`");
+        throwChronicleException(111, "Ssh::executeCommand", "SSH session died before executing command: `" + std::string(command) + "`.");
     }
    
     channel = ssh_channel_new(session);

@@ -22,6 +22,7 @@ pybind11_add_module(chronicle
     src/core/error_handler.cpp
     src/core/ssh.cpp
     src/core/config.cpp
+    src/core/device_factory.cpp
     src/bindings/chronicle.cpp
     3party/inih/ini.c
     3party/inih/cpp/INIReader.cpp

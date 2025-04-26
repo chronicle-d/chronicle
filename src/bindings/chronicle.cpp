@@ -39,4 +39,5 @@ PYBIND11_MODULE(chronicle, m) {
 
     // Chronicle
     m.def("getConfig", &getConfig, "Returns the current device configuration.");
+    m.def("getInterfaces", &getInterfaces, "Returns the interfaces a device has.");
 }

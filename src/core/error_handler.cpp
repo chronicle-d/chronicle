@@ -8,7 +8,7 @@ std::string getErrorMsg(int internal_exit_code) {
         case 103: return "No host provided";
         case 104: return "Could not connect to host";
         case 105: return "Wrong credentials";
-        case 106: return "Could not find .ini file in /etc/chronicle/";
+        case 106: return "Can't load INI file (missing?)";
         case 107: return "Parse error, please check your .ini file";
         case 108: return "NX config, use chronicleConfig first";
         case 109: return "Assertion failed, core level error";
@@ -16,6 +16,7 @@ std::string getErrorMsg(int internal_exit_code) {
         case 111: return "Unknown ssh error";
         case 112: return "No such section in configuration file";
         case 113: return "Reomte error";
+        case 114: return "Error while getting device operations";
         default: return "Unknown error.";
     }
 }
@@ -26,7 +27,7 @@ ChronicleException::ChronicleException(int code, const std::string& message, con
     std::ostringstream oss;
     oss << "[ChronicleError: " << code_ << "]";
     if (!function_name_.empty()) {
-        oss << "[" << function_name_ << "] ";
+        oss << "[" << function_name_ << "]: ";
     }
     oss << message;
     if (!details_.empty()) {

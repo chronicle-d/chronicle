@@ -1,20 +1,43 @@
+from rich import print
+from rich.prompt import Prompt
+from rich.console import Console
 import chronicle
 
-def main():
-    chronicle.readChronicleConfig("/etc/chronicle/chronicle.ini")
-    unit = input("Which device do you want to use? - ").strip()
+console = Console()
 
+def main():
     try:
+        chronicle.readChronicleConfig("/etc/chronicle/error.ini")
+
+        unit = Prompt.ask("[bold cyan][GET][/bold cyan] Which device do you want to use?")
+        operation = Prompt.ask("[bold cyan][GET][/bold cyan] What operation would you like to perform?")
+
         ci = chronicle.getConnectionInfo(unit)
 
-        dir_items = chronicle.getConfig(ci)
+        operations = {
+            "getConfig": chronicle.getConfig,
+            "getInterfaces": chronicle.getInterfaces,
+        }
 
-        print(f"Configuration of '{unit}':")
-        for item in dir_items:
-            print(f"- {item}")
+        if operation not in operations:
+            console.print(f"[bold red][ERROR][/bold red] Unknown operation: [yellow]{operation}[/yellow]")
+            return
 
+        output = operations[operation](ci)
+
+        console.rule(f"[bold green]Device: {unit} | Operation: {operation}[/bold green]")
+        for line in output:
+            if line.strip():
+                console.print(line.rstrip())
+        console.rule()
+
+    except KeyboardInterrupt:
+        console.print("\n[bold yellow][INFO][/bold yellow] User interrupted. Exiting gracefully.")
     except Exception as e:
-        print(f"[ERROR]{e}")
+        console.print(f"[bold red][ERROR][/bold red] {e}")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        console.print("\n[bold yellow][INFO][/bold yellow] Forced exit.")
