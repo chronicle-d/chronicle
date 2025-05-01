@@ -74,9 +74,7 @@ deviceOperations deviceOperations::populateDeviceOperations(int device_id, int v
             }
 
         default:
-            throwChronicleException(114, "deviceOperations::populateDeviceOperations",
-                "No such device ID for Cisco devices. (Device ID: " + std::to_string(device_id) + ")"
-            );
+            THROW_CHRONICLE_EXCEPTION(114, "No such device ID for Cisco devices. (Device ID: " + std::to_string(device_id) + ")");
             break;
         }
 
@@ -102,9 +100,7 @@ deviceOperations deviceOperations::populateDeviceOperations(int device_id, int v
 
 
     } else {
-        throwChronicleException(114, "deviceOperations::populateDeviceOperations",
-            "No such vendor ID. (" + std::to_string(vendor_id) + ")"
-        );
+        THROW_CHRONICLE_EXCEPTION(114, "No such vendor ID. (" + std::to_string(vendor_id) + ")");
     }
 
     return devOps;

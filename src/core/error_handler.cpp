@@ -24,27 +24,33 @@ std::string getErrorMsg(int internal_exit_code) {
     }
 }
 
-ChronicleException::ChronicleException(int code, const std::string& message, const std::string& function, const std::string& details)
-    : std::runtime_error(message), code_(code), function_name_(function), details_(details)
+ChronicleException::ChronicleException(int code, const std::string& message, const std::string& function, const std::string& details, const std::string& file, int line)
+    : std::runtime_error(message), code_(code), function_name_(function), details_(details), file_(file), line_(line)
 {
     std::ostringstream oss;
     oss << "[ChronicleError: " << code_ << "]";
-    if (!function_name_.empty()) {
-        oss << "[" << function_name_ << "]: ";
-    }
+
+    if (!file_.empty())
+        oss << "[" << file_ << ":" << line_ << "]";
+
+    if (!function_name_.empty())
+        oss << "[" << function_name_ << "]";
+
+    oss << ": ";
+
     oss << message;
-    if (!details_.empty()) {
+    if (!details_.empty())
         oss << " => " << details_;
-    }
+
     full_message_ = oss.str();
 }
 
-void throwChronicleException(int internal_exit_code, const std::string& function, const std::string& details) {
-    throw ChronicleException(internal_exit_code, getErrorMsg(internal_exit_code), function, details);
+void throwChronicleException(int internal_exit_code, const std::string& details, const std::string& function, int line, const std::string& filename) {
+    throw ChronicleException(internal_exit_code, getErrorMsg(internal_exit_code), function, details, filename, line);
 }
 
 void chronicleAssert(bool statement, int internal_exit_code, const std::string& function, const std::string& details) {
     if (!statement) {
-        throwChronicleException(internal_exit_code, function, details);
+        throwChronicleException(internal_exit_code, details, function);
     }
 }

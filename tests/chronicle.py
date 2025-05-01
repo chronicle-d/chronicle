@@ -28,13 +28,14 @@ def main():
         console.rule(f"[bold green]Device: {unit} | Operation: {operation}[/bold green]")
         for line in output:
             if line.strip():
-                console.print(line.rstrip())
+                console.print(line.rstrip(), markup=False)  # Prevents accidental markup parsing
         console.rule()
 
     except KeyboardInterrupt:
         console.print("\n[bold yellow][INFO][/bold yellow] User interrupted. Exiting gracefully.")
     except Exception as e:
-        console.print(f"[bold red][ERROR][/bold red] {e}")
+        # Prevent Rich from trying to parse exception strings with square brackets
+        console.print(f"[ERROR] {e}", markup=False)
 
 if __name__ == "__main__":
     try:

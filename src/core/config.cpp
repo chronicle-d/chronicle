@@ -7,9 +7,9 @@ int readChronicleConfig(std::string config_path) {
     int parse_error = chronicleConfig.ParseError();
 
     if (parse_error < 0) {
-        throwChronicleException(10003, "readChronicleConfig", "(file: " + config_path + ")");
+        THROW_CHRONICLE_EXCEPTION(10003, "(file: " + config_path + ")");
     } else if (parse_error > 0) {
-        throwChronicleException(10001, "readChronicleConfig", "(file: " + config_path + ")");
+        THROW_CHRONICLE_EXCEPTION(10001, "(file: " + config_path + ")");
     } else {
         return 0;
     }
@@ -52,7 +52,7 @@ int connectionInfo::getDeviceId(int vendor_id, std::string device_name) {
 }
 
 connectionInfo getConnectionInfo(std::string section) {
-    if (!chronicleConfig.HasSection(section)) throwChronicleException(10002,"getConnectionInfo","(" + section + ")");
+    if (!chronicleConfig.HasSection(section)) THROW_CHRONICLE_EXCEPTION(10002, "(" + section + ")");
     connectionInfo ci;
 
     /* sanitize */

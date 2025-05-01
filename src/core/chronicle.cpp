@@ -6,37 +6,36 @@ std::vector<std::string> getConfig(connectionInfo ci) {
 
     Ssh ssh;
     ssh_session session = ssh.startSession(ci);
+    ssh_channel channel = ssh.startChannel(session);
     std::vector<std::string> output;
 
+    ssh.flushBanner(session, channel);
     for (auto cmd : devOps.getConfig) {
-        int rc = ssh.executeCommand(cmd.c_str(), session, output);
-        if (rc != 0) {
-            ssh.endSession(session);
-            throwChronicleException(201,"getConfig","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
-        }
+        output = ssh.executeCommand(cmd.c_str(), session, channel);
     }
 
+    ssh.closeChannel(channel);
     ssh.endSession(session);
 
     return output;
 }
 
 std::vector<std::string> getInterfaces(connectionInfo ci) {
-    deviceOperations devOps = devOps.populateDeviceOperations(ci.device, ci.vendor);
+    // deviceOperations devOps = devOps.populateDeviceOperations(ci.device, ci.vendor);
 
-    Ssh ssh;
-    ssh_session session = ssh.startSession(ci);
+    // Ssh ssh;
+    // ssh_session session = ssh.startSession(ci);
     std::vector<std::string> output;
 
-    for (auto cmd : devOps.getInterfaces) {
-        int rc = ssh.executeCommand(cmd.c_str(), session, output);
-        if (rc != 0) {
-            ssh.endSession(session);
-            throwChronicleException(201,"getInterfaces","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
-        }
-    }
+    // for (auto cmd : devOps.getInterfaces) {
+    //     int rc = ssh.executeCommand(cmd.c_str(), session, output);
+    //     if (rc != 0) {
+    //         ssh.endSession(session);
+    //         throwChronicleException(201,"getInterfaces","While using: `" + cmd + "`, EXIT CODE: " + std::to_string(rc));
+    //     }
+    // }
 
-    ssh.endSession(session);
+    // ssh.endSession(session);
 
     return output;
 }
