@@ -1,6 +1,8 @@
 #ifndef CHRONICLE_SSH_H
 #define CHRONICLE_SSH_H
 #include "core/config.hpp"
+#include "core/device_factory.hpp"
+#include "core/error_handler.hpp"
 #include "libssh/libssh.h"
 #include <iostream>
 #include <vector>
@@ -9,6 +11,7 @@
 #include <errno.h>
 #include <chrono>
 #include <thread>
+#include <regex>
 #define SSH_FLUSH_BANNER(session, channel) \
     Sss::executeCommand("", session, channel);
 /*
@@ -22,12 +25,31 @@ class Ssh {
     public:
         ssh_session startSession(connectionInfo ci);
         void endSession(ssh_session session);
-        std::vector<std::string> executeCommand(const char *command, ssh_session session, ssh_channel channel);
+        std::vector<std::string> executeCommand(OperationMap opartion_map, ssh_session session, ssh_channel channel);
         ssh_channel startChannel(ssh_session session);
         void closeChannel(ssh_channel channel);
         void flushBanner(ssh_session session, ssh_channel channel);
     private:
         std::string verifyKnownHost(ssh_session session);
+        /* Should be taken from here: https://www.cisco.com/c/en/us/support/switches/catalyst-9300-series-switches/products-system-message-guides-list.html */
+        bool hasError(const std::string& line) {
+            static const std::vector<std::regex> common_error_patterns = {
+                std::regex(R"(^%\w+-3-\w+:.*)", std::regex::icase),
+                std::regex(R"(Invalid input detected)", std::regex::icase),
+                std::regex(R"(Incomplete command)", std::regex::icase),
+                std::regex(R"(Ambiguous command)", std::regex::icase),
+                std::regex(R"(Unrecognized command)", std::regex::icase),
+                std::regex(R"(Unknown command)", std::regex::icase),
+                std::regex(R"(Command rejected)", std::regex::icase),
+                std::regex(R"(^%?Error.*)", std::regex::icase)
+            };
+        
+            for (const auto& re : common_error_patterns) {
+                if (std::regex_search(line, re)) return true;
+            }
+        
+            return false;
+        }        
 };
 
 #endif // CHRONICLE_SSH_H

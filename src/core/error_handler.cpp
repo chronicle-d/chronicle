@@ -11,9 +11,13 @@ std::string getErrorMsg(int internal_exit_code) {
         case 201: return "Connection closed by remote";
         case 202: return "Failed creating an SSH session";
         case 203: return "Could not connect to host";
+        case 204: return "Command faild";
 
         // Device factory
         case 300: return "Error while getting device operations";
+        case 301: return "Wrong device ID provided";
+        case 302: return "Wrong vendor ID provided";
+        case 303: return "Error while loading device map";
 
         // Configuration errors
         case 10000: return "Configuration error";

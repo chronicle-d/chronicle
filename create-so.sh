@@ -40,16 +40,6 @@ make || error_exit "Make failed."
 info "Leaving build directory..."
 cd ..
 
-# Move compiled binary
-info "Moving compiled binary to test directory..."
-mkdir -p "$TEST_DIR"  # Ensure test dir exists
-mv -f "$TARGET_BINARY" "$TEST_DIR/" || error_exit "Failed to move compiled binary."
-
 # Clean up build artifacts
-info "Removing build and bin directories..."
-rm -rf "$BUILD_DIR" "$BIN_DIR"
-
-# Run Python tests
-info "Running Python script..."
-cd "$TEST_DIR"
-python3 "$PYTHON_SCRIPT"
+info "Removing build dir..."
+rm -rf "$BUILD_DIR"

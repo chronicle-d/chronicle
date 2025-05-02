@@ -11,6 +11,8 @@
 
 namespace py = pybind11;
 
+extern void bind_device_loader(py::module_&);
+
 PYBIND11_MODULE(chronicle, m) {
     m.doc() = "Chronicle";
 
@@ -35,9 +37,14 @@ PYBIND11_MODULE(chronicle, m) {
         .def_readwrite("port", &connectionInfo::port)
         .def_readwrite("kex_methods", &connectionInfo::kex_methods)
         .def_readwrite("hostkey_algorithms", &connectionInfo::hostkey_algorithms)
-        .def_readwrite("verbosity", &connectionInfo::verbosity);
+        .def_readwrite("verbosity", &connectionInfo::verbosity)
+        .def("getVendorId", &connectionInfo::getVendorId)
+        .def("getDeviceId", &connectionInfo::getDeviceId);
 
     // Chronicle
     m.def("getConfig", &getConfig, "Returns the current device configuration.");
-    m.def("getInterfaces", &getInterfaces, "Returns the interfaces a device has.");
+
+
+    // Devices
+    bind_device_loader(m);
 }

@@ -1,1 +1,0 @@
-g++ -std=c++17   -Iinclude   -I3party/inih/cpp   tests/main.cpp   src/core/ssh.cpp   src/core/config.cpp   src/core/error_handler.cpp   3party/inih/cpp/INIReader.cpp 3party/inih/ini.c   -lssh -lssl -lcrypto   -o checkssh

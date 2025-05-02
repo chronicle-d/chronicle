@@ -1,7 +1,4 @@
 #include "core/ssh.hpp"
-#include "core/config.hpp"
-#include "core/chronicle.hpp"
-#include "core/error_handler.hpp"
 
 ssh_session Ssh::startSession(connectionInfo ci) {
   ssh_session session;
@@ -76,14 +73,14 @@ void Ssh::closeChannel(ssh_channel channel) {
   ssh_channel_free(channel);
 }
 
-std::vector<std::string> Ssh::executeCommand(const char *command, ssh_session session, ssh_channel channel) {
+std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_session session, ssh_channel channel) {
   int rc;
   char buffer[256];
   int nbytes;
   std::string output;
   std::vector<std::string> output_lines;
   
-  std::string full_command = std::string(command) + "\n";
+  std::string full_command = std::string(operation_map.command) + "\n";
   if (ssh_channel_write(channel, full_command.c_str(), full_command.size()) == SSH_ERROR) {
     closeChannel(channel);
     THROW_CHRONICLE_EXCEPTION(202,ssh_get_error(session));
@@ -119,11 +116,27 @@ std::vector<std::string> Ssh::executeCommand(const char *command, ssh_session se
 
   std::istringstream iss(output);
   std::string line;
+  int line_index = 0;
+  
   while (std::getline(iss, line)) {
-    if (!line.empty() && line.back() == '\r') {
-        line.pop_back();
-    }
-    output_lines.push_back(line);
+      if (!line.empty() && line.back() == '\r') {
+          line.pop_back();
+      }
+  
+      if (line_index++ < operation_map.skip_head)
+          continue;
+  
+      if (hasError(line))
+          THROW_CHRONICLE_EXCEPTION(204, operation_map.err_msg + " (" + line + ")");
+  
+      if (std::regex_match(line, std::regex(R"(^%)", std::regex::icase)))
+          continue;
+  
+      output_lines.push_back(std::move(line));
+  }
+
+  if (operation_map.skip_tail > 0 && operation_map.skip_tail < static_cast<int>(output_lines.size())) {
+    output_lines.resize(output_lines.size() - operation_map.skip_tail);
   }
 
   return output_lines;
@@ -180,5 +193,8 @@ std::string Ssh::verifyKnownHost(ssh_session session) {
 }
 
 void Ssh::flushBanner(ssh_session session, ssh_channel channel) {
-  executeCommand("", session, channel);
+  OperationMap blank_map;
+  blank_map.command = "";
+  blank_map.err_msg = "Unkown error while using flushBanner.";
+  executeCommand(blank_map, session, channel);
 }

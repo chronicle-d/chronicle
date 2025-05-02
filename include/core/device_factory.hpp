@@ -3,50 +3,39 @@
 #include <vector>
 #include <string>
 
-/* This file contains the stuct for each device operation, per device, per vendor */
+/* ---------- Vendor & Device IDs ---------- */
 
-
-
-
-
-
-
-// Cisco devices
+// Cisco vendor ID
 #define CISCO_ID 1
-
-// Routers
 #define ENCS_5100 1
-#define C1700 2
-#define C7200 3
+#define C1700     2
+#define C7200     3
 #define CATALYST_8000V 4
-#define CSR1000V 5
+#define CSR1000V  5
 #define LINUX_TEST 80
 
-
-
-
-
-
-// Juniper devices
+// Juniper vendor ID
 #define JUNIPER_ID 2
 
+/* ---------- Data Structures ---------- */
 
-
-
-
-
-
-
+struct OperationMap {
+    std::string command;
+    int skip_head;
+    int skip_tail;
+    std::string err_msg;
+};
 
 struct deviceOperations {
-    public:
-        deviceOperations populateDeviceOperations(int device_id, int vendor_id);
+    std::vector<OperationMap> getConfig;
+    std::vector<OperationMap> getInterfaces;
 
-        // Operations:
-        std::vector<std::string> getConfig;
-        std::vector<std::string> getInterfaces;
-
-    private:
-        void pushCommand(std::vector<std::string>& operation, std::string command);
+    void pushCommand(std::vector<OperationMap>& list, std::string command, int skip_head, int skip_tail, std::string err_msg);
 };
+
+/* ---------- Required Plugin Exports ---------- */
+
+extern "C" deviceOperations* createDeviceOperations(int device_id, int vendor_id);
+extern "C" const char* getDeviceDetails();
+
 #endif // CHRONICLE_DEVICE_FACTORY_H
