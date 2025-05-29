@@ -33,7 +33,6 @@ DeviceName=LINUX_TEST
 SshVerbosity=0
 User=root
 Password=qwaszx33
-Host=n8n.jetapps.com
-Port=1322
+Host=192.168.1.243
+Port=22
 ```
-
