@@ -1,0 +1,86 @@
+[
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++  -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -fPIC -o CMakeFiles/chronicle_core.dir/src/core/error_handler.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/error_handler.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/error_handler.cpp",
+  "output": "CMakeFiles/chronicle_core.dir/src/core/error_handler.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++  -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -fPIC -o CMakeFiles/chronicle_core.dir/src/core/device_factory.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/device_factory.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/device_factory.cpp",
+  "output": "CMakeFiles/chronicle_core.dir/src/core/device_factory.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/core/chronicle.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/chronicle.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/chronicle.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/core/chronicle.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/core/error_handler.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/error_handler.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/error_handler.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/core/error_handler.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/core/ssh.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/ssh.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/ssh.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/core/ssh.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/core/config.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/config.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/config.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/core/config.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/core/device_factory.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/device_factory.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/core/device_factory.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/core/device_factory.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/bindings/chronicle.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/bindings/chronicle.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/bindings/chronicle.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/bindings/chronicle.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/src/bindings/devices.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/bindings/devices.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/bindings/devices.cpp",
+  "output": "CMakeFiles/chronicle.dir/src/bindings/devices.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/cc -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -x c -fPIC -o CMakeFiles/chronicle.dir/3party/inih/ini.c.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/ini.c",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/ini.c",
+  "output": "CMakeFiles/chronicle.dir/3party/inih/ini.c.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -Dchronicle_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -isystem /usr/include/python3.12 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/chronicle.dir/3party/inih/cpp/INIReader.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp/INIReader.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp/INIReader.cpp",
+  "output": "CMakeFiles/chronicle.dir/3party/inih/cpp/INIReader.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -DCATALYST_8000V_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -fPIC -o CMakeFiles/CATALYST_8000V.dir/src/deviceMaps/Cisco/CATALYST_8000V.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Cisco/CATALYST_8000V.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Cisco/CATALYST_8000V.cpp",
+  "output": "CMakeFiles/CATALYST_8000V.dir/src/deviceMaps/Cisco/CATALYST_8000V.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -DLINUX_TEST_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -fPIC -o CMakeFiles/LINUX_TEST.dir/src/deviceMaps/Cisco/LINUX_TEST.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Cisco/LINUX_TEST.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Cisco/LINUX_TEST.cpp",
+  "output": "CMakeFiles/LINUX_TEST.dir/src/deviceMaps/Cisco/LINUX_TEST.cpp.o"
+},
+{
+  "directory": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/build",
+  "command": "/usr/bin/c++ -DVSRX_EXPORTS -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih -I/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp -I/usr/include/libssh -fPIC -o CMakeFiles/VSRX.dir/src/deviceMaps/Juniper/VSRX.cpp.o -c /home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Juniper/VSRX.cpp",
+  "file": "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/src/deviceMaps/Juniper/VSRX.cpp",
+  "output": "CMakeFiles/VSRX.dir/src/deviceMaps/Juniper/VSRX.cpp.o"
+}
+]

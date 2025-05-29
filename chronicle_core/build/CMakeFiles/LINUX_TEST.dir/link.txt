@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,LINUX_TEST.cld -o /home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Cisco/LINUX_TEST.cld CMakeFiles/LINUX_TEST.dir/src/deviceMaps/Cisco/LINUX_TEST.cpp.o  libchronicle_core.a 

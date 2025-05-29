@@ -1,0 +1,2 @@
+/usr/bin/ar qc libchronicle_core.a CMakeFiles/chronicle_core.dir/src/core/error_handler.cpp.o CMakeFiles/chronicle_core.dir/src/core/device_factory.cpp.o
+/usr/bin/ranlib libchronicle_core.a

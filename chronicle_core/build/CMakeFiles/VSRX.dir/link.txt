@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,VSRX.cld -o /home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Juniper/VSRX.cld CMakeFiles/VSRX.dir/src/deviceMaps/Juniper/VSRX.cpp.o  libchronicle_core.a 

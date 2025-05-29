@@ -1,0 +1,174 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Cisco/CATALYST_8000V.cld"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"chronicle_device",
+			"install",
+			"target_link_libraries",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 89,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 70,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 85,
+				"parent" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 76,
+				"parent" : 1
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 9,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-fPIC"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "CATALYST_8000V_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 5,
+					"path" : "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/include/core"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/3party/inih/cpp"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/usr/include/libssh"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 4,
+			"id" : "chronicle_core::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "CATALYST_8000V::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 3,
+				"path" : "bin/devices/Cisco"
+			},
+			{
+				"backtrace" : 3,
+				"path" : "bin/devices/Cisco"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/usr/local"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "libchronicle_core.a",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "CATALYST_8000V",
+	"nameOnDisk" : "CATALYST_8000V.cld",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/deviceMaps/Cisco/CATALYST_8000V.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

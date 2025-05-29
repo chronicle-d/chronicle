@@ -1,0 +1,162 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install",
+			"chronicle_device"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 64,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 89,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 85,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 90,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 85,
+				"parent" : 4
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 93,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 85,
+				"parent" : 6
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : ".",
+			"paths" : 
+			[
+				"/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/chronicle.so"
+			],
+			"targetId" : "chronicle::@6890427a1f51a3e7e1df",
+			"targetIndex" : 3,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "chronicle::@6890427a1f51a3e7e1df",
+				"index" : 3
+			},
+			"destination" : ".",
+			"type" : "cxxModuleBmi"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "bin/devices/Cisco",
+			"paths" : 
+			[
+				"/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Cisco/CATALYST_8000V.cld"
+			],
+			"targetId" : "CATALYST_8000V::@6890427a1f51a3e7e1df",
+			"targetIndex" : 0,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "CATALYST_8000V::@6890427a1f51a3e7e1df",
+				"index" : 0
+			},
+			"destination" : "bin/devices/Cisco",
+			"type" : "cxxModuleBmi"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "Unspecified",
+			"destination" : "bin/devices/Cisco",
+			"paths" : 
+			[
+				"/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Cisco/LINUX_TEST.cld"
+			],
+			"targetId" : "LINUX_TEST::@6890427a1f51a3e7e1df",
+			"targetIndex" : 1,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "LINUX_TEST::@6890427a1f51a3e7e1df",
+				"index" : 1
+			},
+			"destination" : "bin/devices/Cisco",
+			"type" : "cxxModuleBmi"
+		},
+		{
+			"backtrace" : 7,
+			"component" : "Unspecified",
+			"destination" : "bin/devices/Juniper",
+			"paths" : 
+			[
+				"/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/Juniper/VSRX.cld"
+			],
+			"targetId" : "VSRX::@6890427a1f51a3e7e1df",
+			"targetIndex" : 2,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 7,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "VSRX::@6890427a1f51a3e7e1df",
+				"index" : 2
+			},
+			"destination" : "bin/devices/Juniper",
+			"type" : "cxxModuleBmi"
+		}
+	],
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	}
+}
