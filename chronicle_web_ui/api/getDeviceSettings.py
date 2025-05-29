@@ -2,14 +2,14 @@
 import chronicle
 from config.settings import DeviceSettings
 
-def getDeviceSettings(deviceNicname: str) -> DeviceSettings:
-    ds = chronicle.getConnectionInfo(deviceNicname)
+def getDeviceSettings(deviceNickname: str) -> DeviceSettings:
+    ds = chronicle.getConnectionInfo(deviceNickname)
 
     if not hasattr(chronicle, "config") or not chronicle.config.Sections():
         initChronicleConfig()
 
-    deviceName = chronicle.config.Get(deviceNicname, "DeviceName", "")
-    vendorName = chronicle.config.Get(deviceNicname, "Vendor", "")
+    deviceName = chronicle.config.Get(deviceNickname, "DeviceName", "")
+    vendorName = chronicle.config.Get(deviceNickname, "Vendor", "")
 
     return DeviceSettings(
         kexMethods=ds.kex_methods,

@@ -5,13 +5,13 @@ import os
 from  .getDeviceSettings import getDeviceSettings
 
 # Returns a given device configuration
-def getDeviceConfig(deviceNicname: str) -> list[str]:
+def getDeviceConfig(deviceNickname: str) -> list[str]:
 
-    deviceSettings = getDeviceSettings(deviceNicname)
+    deviceSettings = getDeviceSettings(deviceNickname)
 
     deviceMapPath = os.path.join(DEVICES_BASE, deviceSettings.vendorName, deviceSettings.deviceName + ".cld")
 
-    DeviceConnectionInfo = chronicle.getConnectionInfo(deviceNicname)
+    DeviceConnectionInfo = chronicle.getConnectionInfo(deviceNickname)
     DeviceOperationalMap = chronicle.loadDeviceOps(
         deviceMapPath, DeviceConnectionInfo.device, DeviceConnectionInfo.vendor
     )
