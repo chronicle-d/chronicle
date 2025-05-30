@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(realpath "$(dirname "$0")")"
+CHRONICLE_WEB_UI="${SCRIPT_DIR}/chronicle_web_ui"
+CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base"
+
+# Check directories
+[[ -d "$CHRONICLE_WEB_UI" ]] || {
+  echo "Error: $CHRONICLE_WEB_UI not found" >&2
+  exit 1
+}
+[[ -d "$CHRONICLE_BASE" ]] || {
+  echo "Error: $CHRONICLE_BASE not found" >&2
+  exit 1
+}
+
+# Check commands
+command -v npm >/dev/null || {
+  echo "Error: npm not found" >&2
+  exit 1
+}
+command -v flask >/dev/null || {
+  echo "Error: flask not found" >&2
+  exit 1
+}
+
+# Cleanup function to kill background jobs
+cleanup() {
+  echo "Shutting down..."
+  pkill -P $$ || true # Kill all child processes of this script
+  wait
+  echo "All processes terminated."
+}
+
+# Trap termination signals
+trap cleanup SIGINT SIGTERM EXIT
+
+# Start processes
+echo "Starting npm dev server..."
+npm --prefix "$CHRONICLE_WEB_UI" run dev &> /dev/null &
+
+echo "Starting Flask server..."
+flask --app "${CHRONICLE_BASE}/API" run > /dev/null &
+
+sleep 1
+
+clear
+
+echo -e "\033[1;97m • Serving Chronicle at:\033[0m \033[4;36mhttp://localhost:3000/\033[0m\n"
+
+# Wait for background jobs
+wait

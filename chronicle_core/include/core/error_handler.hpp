@@ -22,8 +22,13 @@ class ChronicleException : public std::runtime_error {
 public:
     ChronicleException(int code, const std::string& message, const std::string& function, const std::string& details, const std::string& file, int line);
 
-    int getCode() const { return code_; }
-    const char* what() const noexcept override { return full_message_.c_str(); }
+    // Accessors
+    int getCode() const;
+    std::string getFunction() const;
+    std::string getDetails() const;
+    std::string getFile() const;
+    int getLine() const;
+    const char* what() const noexcept override;
     
 private:
     int code_;

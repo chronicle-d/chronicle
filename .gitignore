@@ -1,0 +1,25 @@
+# Python __pycache__ and compiled files
+__pycache__/
+*.py[cod]
+
+# C++ build and binary outputs
+chronicle_core/build/
+chronicle_core/bin/
+chronicle_core/compile_commands.json
+
+# Node modules and generated files
+chronicle_web_ui/node_modules/
+chronicle_web_ui/package-lock.json
+chronicle_web_ui/.next/
+chronicle_web_ui/.turbo/
+chronicle_web_ui/.eslintcache
+
+# Log files and environment
+*.log
+.env
+.env.*
+
+# Optional editor/IDE settings
+.vscode/
+.idea/
+*.swp

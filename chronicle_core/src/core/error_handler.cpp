@@ -28,6 +28,32 @@ std::string getErrorMsg(int internal_exit_code) {
     }
 }
 
+// Accessors
+int ChronicleException::getCode() const {
+    return code_;
+}
+
+std::string ChronicleException::getFunction() const {
+    return function_name_;
+}
+
+std::string ChronicleException::getDetails() const {
+    return details_;
+}
+
+std::string ChronicleException::getFile() const {
+    return file_;
+}
+
+int ChronicleException::getLine() const {
+    return line_;
+}
+
+const char* ChronicleException::what() const noexcept {
+    return full_message_.c_str();
+}
+
+
 ChronicleException::ChronicleException(int code, const std::string& message, const std::string& function, const std::string& details, const std::string& file, int line)
     : std::runtime_error(message), code_(code), function_name_(function), details_(details), file_(file), line_(line)
 {
