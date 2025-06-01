@@ -13,10 +13,41 @@
     1XX:            Internal core error. (within C++)
     2XX:            SSH error.
     3xx:            Device factory error.
-    1xxxx:          Configuration error
+    1xxxx:          MongoDB error.
+    15xxx:          ChronicleDB error.
 
 */
-std::string getErrorMsg(int internal_exit_code = 100);
+
+// Core internal errors
+#define CHRONICLE_ERROR_UNKNOWN_CORE_ERROR          100
+#define CHRONICLE_ERROR_ASSERTION_FAILED            101
+
+// SSH errors
+#define CHRONICLE_ERROR_SSH_UNKNOWN                 200
+#define CHRONICLE_ERROR_SSH_CLOSED_REMOTE           201
+#define CHRONICLE_ERROR_SSH_SESSION_FAILED          202
+#define CHRONICLE_ERROR_SSH_CONNECTION_FAILED       203
+#define CHRONICLE_ERROR_SSH_COMMAND_FAILED          204
+
+// Device factory
+#define CHRONICLE_ERROR_DEVICE_FACTORY_FAILED       300
+#define CHRONICLE_ERROR_INVALID_DEVICE_ID           301
+#define CHRONICLE_ERROR_INVALID_VENDOR_ID           302
+#define CHRONICLE_ERROR_LOAD_DEVICE_MAP_FAILED      303
+
+// MongoDB errors
+#define CHRONICLE_ERROR_MONGO_UNKNOWN               10000
+#define CHRONICLE_ERROR_MONGO_CREATE_COLLECTION     10001
+#define CHRONICLE_ERROR_MONGO_INSERT_FAILED         10002
+#define CHRONICLE_ERROR_MONGO_UPDATE_FAILED         10003
+#define CHRONICLE_ERROR_MONGO_DUPLICATE             10004
+#define CHRONICLE_ERROR_MONGO_COLLECTION_NOT_FOUND  10005
+
+// ChronicleDB logic-level errors
+#define CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED     15000
+#define CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED  15001
+
+std::string getErrorMsg(int internal_exit_code = CHRONICLE_ERROR_UNKNOWN_CORE_ERROR);
 
 class ChronicleException : public std::runtime_error {
 public:
@@ -39,8 +70,8 @@ private:
     int line_;
 };
 
-void throwChronicleException(int internal_exit_code = 100, const std::string& details = "", const std::string& function = "", int line = -1, const std::string& filename = "");
+void throwChronicleException(int internal_exit_code = CHRONICLE_ERROR_UNKNOWN_CORE_ERROR, const std::string& details = "", const std::string& function = "", int line = -1, const std::string& filename = "");
 
-void chronicleAssert(bool statement, int internal_exit_code = 101, const std::string& function = "", const std::string& details = "");
+void chronicleAssert(bool statement, int internal_exit_code = CHRONICLE_ERROR_ASSERTION_FAILED, const std::string& function = "", const std::string& details = "");
 
 #endif // CHRONICLE_ERROR_HANDLER_HPP

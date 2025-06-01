@@ -9,12 +9,12 @@ extern "C" deviceOperations* createDeviceOperations(int device_id, int vendor_id
     auto* devOps = new deviceOperations();
 
     if (vendor_id != CISCO_ID) {
-        THROW_CHRONICLE_EXCEPTION(301, "Vendor ID does not match Cisco. (" + std::to_string(vendor_id) + " instead of " + std::to_string(CISCO_ID) + ")");
+        THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_INVALID_VENDOR_ID, "Vendor ID does not match Cisco. (" + std::to_string(vendor_id) + " instead of " + std::to_string(CISCO_ID) + ")");
         return nullptr;
     };
     
     if (device_id != CATALYST_8000V) {
-        THROW_CHRONICLE_EXCEPTION(301, "Device ID does not match CATALYST_8000V. (" + std::to_string(device_id) + " instead of " + std::to_string(CATALYST_8000V) + ")");
+        THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_INVALID_DEVICE_ID, "Device ID does not match CATALYST_8000V. (" + std::to_string(device_id) + " instead of " + std::to_string(CATALYST_8000V) + ")");
         return nullptr;
     };
 

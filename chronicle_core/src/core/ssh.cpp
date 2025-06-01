@@ -6,7 +6,7 @@ ssh_session Ssh::startSession(connectionInfo ci) {
 
   session = ssh_new();
   if (session == NULL) {
-      THROW_CHRONICLE_EXCEPTION(202,ssh_get_error(session));
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED,ssh_get_error(session));
   }
 
   ssh_options_set(session, SSH_OPTIONS_HOST, ci.host.c_str());
@@ -18,19 +18,19 @@ ssh_session Ssh::startSession(connectionInfo ci) {
   int rc = ssh_connect(session);
   if (rc != SSH_OK)
   {
-    THROW_CHRONICLE_EXCEPTION(203,ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_CONNECTION_FAILED,ssh_get_error(session));
   }
 
   std::string known_host_msg = verifyKnownHost(session);
   if (known_host_msg.size() > 0) {
       endSession(session);
-      THROW_CHRONICLE_EXCEPTION(202,known_host_msg);
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED,known_host_msg);
   }
 
   rc = ssh_userauth_password(session, ci.user.c_str(), ci.password.c_str());
   if (rc != SSH_AUTH_SUCCESS) {
       endSession(session);
-      THROW_CHRONICLE_EXCEPTION(202, "Password for user \"" + ci.user + "\" is wrong");
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, "Password for user \"" + ci.user + "\" is wrong");
   }
 
   return session;
@@ -41,29 +41,29 @@ ssh_channel Ssh::startChannel(ssh_session session) {
 
   if (!ssh_is_connected(session)) {
     endSession(session);
-    THROW_CHRONICLE_EXCEPTION(200, "SSH session died, could not create channel.");
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_UNKNOWN, "SSH session died, could not create channel.");
   }
   
   channel = ssh_channel_new(session);
   if (channel == NULL)
-    THROW_CHRONICLE_EXCEPTION(202, ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, ssh_get_error(session));
 
   if (ssh_channel_open_session(channel) != SSH_OK) {
     ssh_channel_close(channel);
     ssh_channel_free(channel);
-    THROW_CHRONICLE_EXCEPTION(202, ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, ssh_get_error(session));
   }
 
   if (ssh_channel_request_pty(channel) != SSH_OK) {
     ssh_channel_close(channel);
     ssh_channel_free(channel);
-    THROW_CHRONICLE_EXCEPTION(202, ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, ssh_get_error(session));
   }
 
   if (ssh_channel_request_shell(channel) != SSH_OK) {
     ssh_channel_close(channel);
     ssh_channel_free(channel);
-    THROW_CHRONICLE_EXCEPTION(202,ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED,ssh_get_error(session));
   }
 
   return channel;
@@ -92,7 +92,7 @@ std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_ses
   std::string full_command = std::string(operation_map.command) + "\n";
   if (ssh_channel_write(channel, full_command.c_str(), full_command.size()) == SSH_ERROR) {
     closeChannel(channel);
-    THROW_CHRONICLE_EXCEPTION(202,ssh_get_error(session));
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED,ssh_get_error(session));
   }
 
   auto start = std::chrono::steady_clock::now();
@@ -102,7 +102,7 @@ std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_ses
     // Read stdout (stream 0)
     rc = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), 0);
     if (rc == SSH_ERROR) {
-      THROW_CHRONICLE_EXCEPTION(302, "SSH non-blocking read failed");
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, "SSH non-blocking read failed");
     }
     if (rc > 0) {
       output.append(buffer, rc);
@@ -112,7 +112,7 @@ std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_ses
     // Read stderr (stream 1)
     rc = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), 1);
     if (rc == SSH_ERROR) {
-      THROW_CHRONICLE_EXCEPTION(302, "SSH non-blocking read failed (stderr)");
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_SESSION_FAILED, "SSH non-blocking read failed (stderr)");
     }
     if (rc > 0) {
       error_output.append(buffer, rc);
@@ -132,7 +132,7 @@ std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_ses
   }
 
   if (!error_output.empty()) {
-    THROW_CHRONICLE_EXCEPTION(204, operation_map.err_msg + " (stderr: " + error_output + ")");
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_COMMAND_FAILED, operation_map.err_msg + " (stderr: " + error_output + ")");
   }
 
   std::istringstream iss(output);
@@ -148,7 +148,7 @@ std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_ses
           continue;
   
       if (hasError(line))
-          THROW_CHRONICLE_EXCEPTION(204, operation_map.err_msg + " (" + line + ")");
+          THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_COMMAND_FAILED, operation_map.err_msg + " (" + line + ")");
   
       if (std::regex_match(line, std::regex(R"(^%)", std::regex::icase)))
           continue;
@@ -223,7 +223,7 @@ void Ssh::flushBanner(ssh_session session, ssh_channel channel) {
   while (true) {
     rc = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), 0);
     if (rc == SSH_ERROR) {
-      THROW_CHRONICLE_EXCEPTION(200, "SSH non-blocking read failed during flushBanner");
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_SSH_UNKNOWN, "SSH non-blocking read failed during flushBanner");
     }
     if (rc > 0) {
       last_data = std::chrono::steady_clock::now();

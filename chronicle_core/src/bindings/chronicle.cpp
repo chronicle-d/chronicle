@@ -4,6 +4,7 @@
 #include "core/config.hpp"
 #include "core/chronicle.hpp"
 #include "core/error_handler.hpp"
+#include "database_handler.hpp"
 
 namespace py = pybind11;
 
@@ -69,7 +70,40 @@ PYBIND11_MODULE(chronicle, m) {
         .def_readwrite("ssh_idle_timeout", &chronicleSettings::ssh_idle_timeout)
         .def_readwrite("ssh_total_timeout", &chronicleSettings::ssh_total_timeout);
 
-    m.def("getConfig", &getConfig, "Returns the current device configuration.");
+    m.def("getConfig", &getConfig, 
+          py::arg("ConnectionInfo"),
+          py::arg("OperationMap"),
+          "Returns the current device configuration.");
+
+    // ChronicleDB
+    // - Devices
+    py::class_<ChronicleDB>(m, "ChronicleDB")
+    .def(py::init<>())
+    .def("addDevice", &ChronicleDB::addDevice,
+        py::arg("deviceNickname"),
+        py::arg("deviceName"),
+        py::arg("vendor"),
+        py::arg("user"),
+        py::arg("password"),
+        py::arg("host"),
+        py::arg("port") = CHRONICLE_CONFIG_DEFUALT_PORT,
+        py::arg("sshVerbosity") = 0,
+        py::arg("kexMethods") = CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
+        py::arg("hostkeyAlgorithms") = CHRONICLE_CONFIG_DEFUALT_HOSTKEYS,
+        "Add a new device to the Chronicle database.")
+    .def("modifyDevice", &ChronicleDB::modifyDevice,
+        py::arg("deviceNickname"),
+        py::arg("deviceName"),
+        py::arg("vendor"),
+        py::arg("user"),
+        py::arg("password"),
+        py::arg("host"),
+        py::arg("port"),
+        py::arg("sshVerbosity"),
+        py::arg("kexMethods"),
+        py::arg("hostkeyAlgorithms"),
+        "Modify a device in the Chronicle database.");
+
 
     bind_device_loader(m);
 }

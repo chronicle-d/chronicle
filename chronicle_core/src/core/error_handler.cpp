@@ -3,27 +3,34 @@
 std::string getErrorMsg(int internal_exit_code) {
     switch (internal_exit_code) {
         // Internal errors
-        case 100: return "Unknown core level error";
-        case 101: return "Assertion failed, core level error";
+        case CHRONICLE_ERROR_UNKNOWN_CORE_ERROR: return "Unknown core level error";
+        case CHRONICLE_ERROR_ASSERTION_FAILED: return "Assertion failed, core level error";
 
         // SSH errors
-        case 200: return "Unknown ssh error";
-        case 201: return "Connection closed by remote";
-        case 202: return "Failed creating an SSH session";
-        case 203: return "Could not connect to host";
-        case 204: return "Command faild";
+        case CHRONICLE_ERROR_SSH_UNKNOWN: return "Unknown ssh error";
+        case CHRONICLE_ERROR_SSH_CLOSED_REMOTE: return "Connection closed by remote";
+        case CHRONICLE_ERROR_SSH_SESSION_FAILED: return "Failed creating an SSH session";
+        case CHRONICLE_ERROR_SSH_CONNECTION_FAILED: return "Could not connect to host";
+        case CHRONICLE_ERROR_SSH_COMMAND_FAILED: return "Command failed";
 
         // Device factory
-        case 300: return "Error while getting device operations";
-        case 301: return "Wrong device ID provided";
-        case 302: return "Wrong vendor ID provided";
-        case 303: return "Error while loading device map";
+        case CHRONICLE_ERROR_DEVICE_FACTORY_FAILED: return "Error while getting device operations";
+        case CHRONICLE_ERROR_INVALID_DEVICE_ID: return "Wrong device ID provided";
+        case CHRONICLE_ERROR_INVALID_VENDOR_ID: return "Wrong vendor ID provided";
+        case CHRONICLE_ERROR_LOAD_DEVICE_MAP_FAILED: return "Error while loading device map";
 
-        // Configuration errors
-        case 10000: return "Configuration error";
-        case 10001: return "Parse error, please check your .ini file";
-        case 10002: return "No such section in configuration file";
-        case 10003: return "Can't load INI file (missing?)";
+        // MongoDB
+        case CHRONICLE_ERROR_MONGO_UNKNOWN: return "Unknown error while using MongoDB";
+        case CHRONICLE_ERROR_MONGO_CREATE_COLLECTION: return "Failed to create a collection while initializing database";
+        case CHRONICLE_ERROR_MONGO_INSERT_FAILED: return "Failed to insert a document into a collection";
+        case CHRONICLE_ERROR_MONGO_UPDATE_FAILED: return "Failed to update a document in a collection";
+        case CHRONICLE_ERROR_MONGO_DUPLICATE: return "Duplicate document";
+        case CHRONICLE_ERROR_MONGO_COLLECTION_NOT_FOUND: return "Collection not found";
+
+        // ChronicleDB
+        case CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED: return "Failed while trying to add";
+        case CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED: return "Faild while trying to modify";
+
         default: return "Unknown error.";
     }
 }
