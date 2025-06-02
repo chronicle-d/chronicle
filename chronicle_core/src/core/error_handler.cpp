@@ -25,11 +25,13 @@ std::string getErrorMsg(int internal_exit_code) {
         case CHRONICLE_ERROR_MONGO_INSERT_FAILED: return "Failed to insert a document into a collection";
         case CHRONICLE_ERROR_MONGO_UPDATE_FAILED: return "Failed to update a document in a collection";
         case CHRONICLE_ERROR_MONGO_DUPLICATE: return "Duplicate document";
-        case CHRONICLE_ERROR_MONGO_COLLECTION_NOT_FOUND: return "Collection not found";
+        case CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND: return "Collection not found";
+        case CHRONICLE_ERROR_MONGO_DELETE_DOCUMENT: return "Could not delete document";
 
         // ChronicleDB
         case CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED: return "Failed while trying to add";
-        case CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED: return "Faild while trying to modify";
+        case CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED: return "Failed while trying to modify";
+        case CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED: return "Failed while trying to delete";
 
         default: return "Unknown error.";
     }

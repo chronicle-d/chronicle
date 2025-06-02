@@ -3,6 +3,7 @@ import chronicle
 from core.chronicle import initChronicleConfig
 from flask import Blueprint
 from core.response import makeResponse
+from config.settings import API_ROUTE
 
 my_blueprint = Blueprint("listdevices", __name__)
 
@@ -13,7 +14,7 @@ def listDevices() -> list[str]:
     filtered = [s for s in sections if s.lower() != "chroniclesettings"]
     return filtered
 
-@my_blueprint.route("/listDevices", methods=["GET"])
+@my_blueprint.route(API_ROUTE + "/listDevices", methods=["GET"])
 def list_devices_route():
     devices = listDevices()
     return makeResponse(

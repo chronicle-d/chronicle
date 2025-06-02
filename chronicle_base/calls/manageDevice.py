@@ -7,7 +7,8 @@ from config.settings import (
     CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
     CHRONICLE_CONFIG_DEFUALT_PORT,
     CHRONICLE_CONFIG_DEFUALT_USER,
-    CHRONICLE_CONFIG_DEFUALT_VERBOSITY
+    CHRONICLE_CONFIG_DEFUALT_VERBOSITY,
+    API_ROUTE
 )
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
 
@@ -107,11 +108,13 @@ MODIFY_DEVICE_SCHEMA = {
 
 my_blueprint = Blueprint("managedevice", __name__)
 
-@my_blueprint.route("/manageDevice", methods=["POST"])
+@my_blueprint.route(API_ROUTE + "/manageDevice", methods=["POST"])
 def manage_device_route():
     global_error, global_data = validateParams(request.args, GLOBAL_SCHEMA)
     if global_error:
         return global_error
+
+    assert global_data is not None, "Expected validated params, got None"
 
     action = global_data["action"]
 
@@ -119,6 +122,8 @@ def manage_device_route():
         error, data = validateParams(request.args, CREATE_DEVICE_SCHEMA)
         if error:
             return error
+
+        assert data is not None, "Expected validated params, got None"
 
         deviceNickname = data["name"]
         deviceName = data["device"]
@@ -173,6 +178,8 @@ def manage_device_route():
         error, data = validateParams(request.args, MODIFY_DEVICE_SCHEMA)
         if error:
             return error
+
+        assert data is not None, "Expected validated params, got None"
 
         deviceNickname = data["name"]
         deviceName = data.get("device")

@@ -94,7 +94,7 @@ void MongoDB::updateDocument(mongocxx::collection& collection, const std::string
             "No matching document found to update.\n"
             "Collection: " + std::string(collection.name()) + "\n"
             "Query filter: " + bsoncxx::to_json(queryFilter);
-        THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_COLLECTION_NOT_FOUND, fullMessage);
+        THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND, fullMessage);
     }
   } catch (const ChronicleException& e) {
     // Re-throw unchanged
@@ -108,4 +108,39 @@ void MongoDB::updateDocument(mongocxx::collection& collection, const std::string
 			"Error: " + e.what();
 		THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_UPDATE_FAILED, fullMessage);
 	}
+}
+
+void MongoDB::deleteDocument(mongocxx::collection& collection, const std::string& deviceNickname) {
+  bsoncxx::builder::basic::document queryFilter;
+  queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
+
+  try {
+    auto result = collection.delete_one(queryFilter.view());
+
+    if (!result) {
+      std::string fullMessage =
+        "No result returned from delete_one.\n"
+        "Collection: " + std::string(collection.name()) + "\n"
+        "Query filter: " + bsoncxx::to_json(queryFilter);
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_DELETE_DOCUMENT, fullMessage);
+    }
+
+    if (result->deleted_count() == 0) {
+      std::string fullMessage =
+        "No matching document found to delete.\n"
+        "Collection: " + std::string(collection.name()) + "\n"
+        "Query filter: " + bsoncxx::to_json(queryFilter);
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND, fullMessage);
+    }
+
+  } catch (const ChronicleException& e) {
+    throw;
+  } catch (const std::exception& e) {
+    std::string fullMessage =
+      "MongoDB delete failed.\n"
+      "Collection: " + std::string(collection.name()) + "\n"
+      "Query filter: " + bsoncxx::to_json(queryFilter) + "\n"
+      "Error: " + e.what();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_DELETE_DOCUMENT, fullMessage);
+  }
 }

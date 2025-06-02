@@ -5,6 +5,7 @@
 #include "core/chronicle.hpp"
 #include "core/error_handler.hpp"
 #include "database_handler.hpp"
+#include "core/mongodb.hpp"
 
 namespace py = pybind11;
 
@@ -102,8 +103,10 @@ PYBIND11_MODULE(chronicle, m) {
         py::arg("sshVerbosity"),
         py::arg("kexMethods"),
         py::arg("hostkeyAlgorithms"),
-        "Modify a device in the Chronicle database.");
-
+        "Modify a device in the Chronicle database.")
+    .def("deleteDevice", &ChronicleDB::deleteDevice,
+        py::arg("deviceNickname"),
+        "Delete a device in the Chronicle database.");
 
     bind_device_loader(m);
 }

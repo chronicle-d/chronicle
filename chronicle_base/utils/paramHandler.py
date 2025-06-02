@@ -11,7 +11,7 @@ def validateParams(params: dict, schema: dict):
             return makeResponse(False, rule["required_error"], {}, 400), None
 
         if value is None:
-            if rule.get("type") == str:
+            if rule.get("type") is str:
                 validated[key] = ""
             continue
 

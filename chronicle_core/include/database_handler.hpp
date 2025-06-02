@@ -1,3 +1,6 @@
+#ifndef CHRONICLE_DATABASE_HANDLER_HPP
+#define CHRONICLE_DATABASE_HANDLER_HPP
+
 #include "config.hpp"
 #include "core/mongodb.hpp"
 #include "core/error_handler.hpp"
@@ -39,4 +42,7 @@ class ChronicleDB {
       std::optional<std::string> kexMethods = std::nullopt,
       std::optional<std::string> hostkeyAlgorithms = std::nullopt
     );
+
+    void deleteDevice(const std::string& deviceNickname);
 };
+#endif // CHRONICLE_DATABASE_HANDLER_HPP

@@ -3,10 +3,11 @@ from flask import Blueprint, request
 from chronicle import ChronicleException, getErrorMsg
 from core.response import makeResponse
 from core.chronicle import getDeviceSettings
+from config.settings import API_ROUTE
 
 my_blueprint = Blueprint("getdevicesettings", __name__)
 
-@my_blueprint.route("/getDeviceSettings", methods=["GET"])
+@my_blueprint.route(API_ROUTE + "/getDeviceSettings", methods=["GET"])
 def get_device_settings_route():
     deviceNickname = request.args.get("name")
     if not deviceNickname :

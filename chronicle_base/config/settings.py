@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 CONFIG_PATH = "/etc/chronicle/chronicle.ini"
 DEVICES_BASE = "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/"
+API_ROUTE = "/api"
 
 # Ddefault values
 ## Device

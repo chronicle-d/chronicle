@@ -1,3 +1,5 @@
+#ifndef CHRONICLE_MONGODB_HPP
+#define CHRONICLE_MONGODB_HPP
 /*
  * MongoDB driver wrapper for easier use inside chronicle
  *
@@ -39,8 +41,10 @@ class MongoDB {
     MongoDB();
     void insertDocument(mongocxx::collection& collection, const bsoncxx::document::view_or_value& doc);
     void updateDocument(mongocxx::collection& collection, const std::string& deviceNickname, const bsoncxx::document::view_or_value& data);
+    void deleteDocument(mongocxx::collection& collection, const std::string& deviceNickname);
 
     mongocxx::collection devices_c;
     mongocxx::collection users_c;
     mongocxx::collection settings_c;
 };
+#endif // CHRONICLE_MONGODB_HPP

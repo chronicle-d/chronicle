@@ -1,6 +1,4 @@
 #include "database_handler.hpp"
-#include "error_handler.hpp"
-#include <string>
 
 MongoDB mdb;
 
@@ -103,7 +101,7 @@ void ChronicleDB::modifyDevice(
 
     std::string fullMessage;
 
-    if (e.getCode() == CHRONICLE_ERROR_MONGO_COLLECTION_NOT_FOUND) {
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
       fullMessage = "Device " + deviceNickname + " not found";
       THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
     }
@@ -115,5 +113,26 @@ void ChronicleDB::modifyDevice(
     THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
   } catch (const std::exception& e) {
     THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, e.what());
+  }
+}
+
+void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
+  try {
+    mdb.deleteDocument(mdb.devices_c, deviceNickname);
+  } catch (const ChronicleException& e) {
+    std::string fullMessage;
+
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
+      fullMessage = "Device " + deviceNickname + " not found";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, fullMessage);
+    }
+
+    fullMessage =
+      "Chronicle exception:\n"
+      "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+      "Details: " + e.getDetails();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, fullMessage);
+  } catch (const std::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, e.what());
   }
 }

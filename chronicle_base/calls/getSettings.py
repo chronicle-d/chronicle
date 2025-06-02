@@ -3,10 +3,11 @@ from flask import Blueprint
 from core.response import makeResponse
 from core.chronicle import getSettings
 from chronicle import ChronicleException
+from config.settings import API_ROUTE
 
 my_blueprint = Blueprint("getsettings", __name__)
 
-@my_blueprint.route("/getSettings", methods=["GET"])
+@my_blueprint.route(API_ROUTE + "/getSettings", methods=["GET"])
 def get_settings_route():
     try:
         chronicleSettings = getSettings()

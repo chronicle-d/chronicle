@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from config.settings import DEVICES_BASE
+from config.settings import API_ROUTE, DEVICES_BASE
 from core.chronicle import getDeviceSettings
 from core.response import makeResponse
 import chronicle
@@ -26,7 +26,7 @@ def getDeviceConfig(deviceNickname: str) -> list[str]:
     return deviceConfig
 
 
-@my_blueprint.route("/getDeviceConfig", methods=["GET"])
+@my_blueprint.route(API_ROUTE + "/getDeviceConfig", methods=["GET"])
 def get_device_config_route():
     deviceNickname = request.args.get("name")
     if not deviceNickname :
