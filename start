@@ -1,7 +1,7 @@
 #!/bin/bash
 
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 set -euo pipefail
-
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 CHRONICLE_WEB_UI="${SCRIPT_DIR}/chronicle_web_ui"
 CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base"
@@ -39,10 +39,10 @@ trap cleanup SIGINT SIGTERM EXIT
 
 # Start processes
 echo "Starting npm dev server..."
-npm --prefix "$CHRONICLE_WEB_UI" run dev &> /dev/null &
+npm --prefix "$CHRONICLE_WEB_UI" run dev &>/dev/null &
 
 echo "Starting Flask server..."
-flask --app "${CHRONICLE_BASE}/API" run > /dev/null &
+flask --app "${CHRONICLE_BASE}/API" run >/dev/null &
 
 sleep 1
 

@@ -41,8 +41,8 @@ class MongoDB {
   public:
     MongoDB();
     void insertDocument(mongocxx::collection& collection, const bsoncxx::document::view_or_value& doc);
-    void updateDocument(mongocxx::collection& collection, const std::string& deviceNickname, const bsoncxx::document::view_or_value& data);
-    void deleteDocument(mongocxx::collection& collection, const std::string& deviceNickname);
+    void updateDocument(mongocxx::collection& collection, bsoncxx::builder::basic::document& queryFilter, const bsoncxx::document::view_or_value& data);
+    void deleteDocument(mongocxx::collection& collection, bsoncxx::builder::basic::document& queryFilter);
     std::vector<bsoncxx::document::value> findDocuments(
       mongocxx::collection& collection,
       const bsoncxx::document::view_or_value& filter,

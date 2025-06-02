@@ -27,6 +27,18 @@ def get_device_route():
 
     try:
         raw_response = ChronicleDB().getDevice(deviceNickname=deviceNickname)
+        if not raw_response:
+            return makeResponse(
+                False,
+                f"Device {deviceNickname} does not exist.",
+                {
+                    "error": {
+                        "details": "Device does not exist."
+                    }
+                },
+                404
+            )
+
         response = json.loads(raw_response)
 
         return makeResponse(

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Loader2, Settings, HardDrive, ChevronDown, Home } from 'lucide-react';
 import Head from 'next/head';
 
-const API_BASE = 'http://127.0.0.1:5000';
+const API_BASE = 'http://127.0.0.1:5000/api';
 
 export default function ChronicleDashboard() {
   const [devices, setDevices] = useState([]);
@@ -30,15 +30,16 @@ export default function ChronicleDashboard() {
     const code = err?.code;
     const codeMessage = err?.codeMessage;
     const details = err?.details;
+    const fallbackMessage = responseData?.message || input?.message;
 
     let content = '';
     if (code && codeMessage) {
       content += `Error ${code}: ${codeMessage}`;
       if (details) content += `\n\n${details}`;
-    } else if (input?.response?.status) {
-      content = `Request failed with status ${input.response.status}`;
-    } else if (input?.message) {
-      content = input.message;
+    } else if (details) {
+      content = details;
+    } else if (fallbackMessage) {
+      content = fallbackMessage;
     } else {
       content = typeof input === 'string' ? input : JSON.stringify(input, null, 2);
     }
@@ -55,17 +56,7 @@ export default function ChronicleDashboard() {
       const res = await axios.get(`${API_BASE}/listDevices`);
       if (res.data.success) {
         setDevices(res.data.data.devices);
-        const featuredData = await Promise.all(
-          res.data.data.devices.slice(0, 2).map(async (name) => {
-            try {
-              const detailRes = await axios.get(`${API_BASE}/getDeviceSettings?name=${name}`);
-              return detailRes.data.data;
-            } catch {
-              return null;
-            }
-          })
-        );
-        setFeatured(featuredData.filter(Boolean));
+        setFeatured(res.data.data.devices.slice(0, 2));
       } else {
         showError(res);
       }
@@ -83,14 +74,14 @@ export default function ChronicleDashboard() {
     }
   };
 
-  const selectDevice = async (device) => {
+  const selectDevice = async (deviceName) => {
     setShowSettings(false);
-    setSelectedDevice(device);
+    setSelectedDevice(deviceName);
     setDeviceSettings(null);
     setDeviceConfig(null);
     setDropdownOpen(false);
     try {
-      const res = await axios.get(`${API_BASE}/getDeviceSettings?name=${device}`);
+      const res = await axios.get(`${API_BASE}/getDevice?name=${deviceName}`);
       if (res.data.success) setDeviceSettings(res.data.data);
       else showError(res);
     } catch (err) {
@@ -153,19 +144,24 @@ export default function ChronicleDashboard() {
 
       <main className={`flex-1 overflow-y-auto transition-all duration-300 ${sidebarCollapsed ? 'ml-[56px]' : 'ml-64'} flex justify-center items-start px-8 py-12`}>
         <div className="w-full max-w-4xl">
+
+          {/* Error Banner */}
           {errors.map((err) => (
-            <div key={err.id} className="fixed top-4 right-4 z-50 bg-red-500/90 text-white px-6 py-4 rounded shadow-lg text-sm font-mono whitespace-pre-wrap border border-red-700 w-[420px] max-w-[calc(100vw-2rem)]">
-              <div className="flex justify-between items-start">
-                <div className="flex gap-2">
-                  <span className="text-xl mt-0.5">⚠️</span>
-                  <div className="text-left">
-                    {err.content.split('\n').map((line, i) => (
-                      <div key={i} className={i === 0 ? 'font-semibold text-base mb-1' : 'text-white/90'}>{line}</div>
-                    ))}
+            <div key={err.id} className="fixed top-2 right-2 z-50 bg-red-500/80 backdrop-blur-sm text-white px-6 py-4 rounded shadow text-sm font-mono whitespace-pre-wrap border border-red-600 flex items-start gap-2 w-[420px] max-w-[calc(100vw-2rem)]">
+              <span className="text-lg leading-none mt-0.5">⚠️</span>
+              <div className="flex-1 text-left">
+                {err.content.split('\n').map((line, i) => (
+                  <div key={i} className={i === 0 ? 'font-semibold mb-1 text-base' : 'text-sm text-white/90'}>
+                    {line}
                   </div>
-                </div>
-                <button onClick={() => setErrors(errors.filter((e) => e.id !== err.id))} className="ml-2 text-white font-bold">×</button>
+                ))}
               </div>
+              <button
+                onClick={() => setErrors(errors.filter((e) => e.id !== err.id))}
+                className="text-white font-bold ml-2 self-start"
+              >
+                ×
+              </button>
             </div>
           ))}
 

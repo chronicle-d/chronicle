@@ -72,11 +72,7 @@ void MongoDB::insertDocument(mongocxx::collection& collection, const bsoncxx::do
   }
 }
 
-void MongoDB::updateDocument(mongocxx::collection& collection, const std::string& deviceNickname, const bsoncxx::document::view_or_value& doc) {
-  bsoncxx::builder::basic::document queryFilter;
-
-  queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
-
+void MongoDB::updateDocument(mongocxx::collection& collection, bsoncxx::builder::basic::document& queryFilter, const bsoncxx::document::view_or_value& doc) {
   bsoncxx::builder::basic::document updateDoc;
   updateDoc.append(bsoncxx::builder::basic::kvp("$set", doc));
 
@@ -110,10 +106,7 @@ void MongoDB::updateDocument(mongocxx::collection& collection, const std::string
 	}
 }
 
-void MongoDB::deleteDocument(mongocxx::collection& collection, const std::string& deviceNickname) {
-  bsoncxx::builder::basic::document queryFilter;
-  queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
-
+void MongoDB::deleteDocument(mongocxx::collection& collection,  bsoncxx::builder::basic::document& queryFilter) {
   try {
     auto result = collection.delete_one(queryFilter.view());
 

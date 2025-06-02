@@ -9,11 +9,19 @@
 
 class ChronicleDB {
   public:
-    /* Devices */
     struct MongoProjections {
       static const bsoncxx::document::view_or_value device();
+      static const bsoncxx::document::view_or_value settings();
     };
 
+    /* Chronicle settings */
+    void updateSettings(
+      std::optional<int> sshIdleTimeout = CHRONICLE_CONFIG_DEFAULT_SSH_IDLE_TIMEOUT,
+      std::optional<int> sshTotalTimeout = CHRONICLE_CONFIG_DEFAULT_SSH_TOTAL_TIMEOUT
+    );
+    std::string getSettings();
+
+    /* Devices */
     void addDevice(
       // General
       const std::string& deviceNickname,

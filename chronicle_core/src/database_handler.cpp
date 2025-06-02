@@ -21,6 +21,56 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
   );
 }
 
+const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::settings() {
+  return bsoncxx::builder::basic::make_document(
+    bsoncxx::builder::basic::kvp("_id", 0),
+    bsoncxx::builder::basic::kvp("ssh", bsoncxx::builder::basic::make_document(
+      bsoncxx::builder::basic::kvp("sshIdleTimeout", 1),
+      bsoncxx::builder::basic::kvp("sshTotalTimeout", 1)
+    ))
+  );
+}
+
+/* Settings */
+void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optional<int> sshTotalTimeout) {
+  bsoncxx::builder::basic::document filter{};
+  bsoncxx::builder::basic::document updateDoc;
+  
+  // SSH fields
+  if (sshIdleTimeout)           updateDoc.append(bsoncxx::builder::basic::kvp("ssh.sshIdleTimeout", *sshIdleTimeout));
+  if (sshTotalTimeout)          updateDoc.append(bsoncxx::builder::basic::kvp("ssh.sshTotalTimeout", *sshTotalTimeout));
+
+  try {
+    mdb.updateDocument(mdb.settings_c, filter, updateDoc.view());
+  } catch (const ChronicleException& e) {
+
+    std::string fullMessage;
+
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
+      fullMessage = "No settings found for chroniucle.";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+    }
+
+    fullMessage =
+      "Chronicle exception:\n"
+      "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+      "Details: " + e.getDetails();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+  } catch (const std::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, e.what());
+  } 
+}
+
+std::string ChronicleDB::getSettings() {
+  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
+  auto results = mdb.findDocuments(mdb.settings_c, filter, ChronicleDB::MongoProjections::settings());
+
+  std::string settings = bsoncxx::to_json(results[0].view());
+
+  return settings;
+}
+
+/* Devices */
 void ChronicleDB::addDevice(
   // General
   const std::string& deviceNickname,
@@ -114,8 +164,11 @@ void ChronicleDB::modifyDevice(
     THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, "No fields provided to modify.");
   }
 
+  bsoncxx::builder::basic::document queryFilter;
+  queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
+
   try {
-    mdb.updateDocument(mdb.devices_c, deviceNickname, updateDoc.view());
+    mdb.updateDocument(mdb.devices_c, queryFilter, updateDoc.view());
   } catch (const ChronicleException& e) {
 
     std::string fullMessage;
@@ -136,8 +189,12 @@ void ChronicleDB::modifyDevice(
 }
 
 void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
+
+  bsoncxx::builder::basic::document queryFilter;
+  queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
+
   try {
-    mdb.deleteDocument(mdb.devices_c, deviceNickname);
+    mdb.deleteDocument(mdb.devices_c, queryFilter);
   } catch (const ChronicleException& e) {
     std::string fullMessage;
 
@@ -157,7 +214,7 @@ void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
 }
 
 std::vector<std::string> ChronicleDB::listDevices() {
-  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document();
+  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
   auto results = mdb.findDocuments(mdb.devices_c, filter, ChronicleDB::MongoProjections::device());
 
   std::vector<std::string> listOfDevices;
