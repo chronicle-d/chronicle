@@ -5,11 +5,15 @@
 #include "core/mongodb.hpp"
 #include "core/error_handler.hpp"
 #include <optional>
+#include <vector>
 
 class ChronicleDB {
   public:
-
     /* Devices */
+    struct MongoProjections {
+      static const bsoncxx::document::view_or_value device();
+    };
+
     void addDevice(
       // General
       const std::string& deviceNickname,
@@ -44,5 +48,7 @@ class ChronicleDB {
     );
 
     void deleteDevice(const std::string& deviceNickname);
+    std::vector<std::string> listDevices();
+    std::string getDevice(const std::string& deviceNickname);
 };
 #endif // CHRONICLE_DATABASE_HANDLER_HPP

@@ -23,6 +23,7 @@
 
 #include <mongocxx/collection.hpp>
 #include <mongocxx/database.hpp>
+#include <mongocxx/options/find.hpp>
 
 #include <string>
 
@@ -42,6 +43,12 @@ class MongoDB {
     void insertDocument(mongocxx::collection& collection, const bsoncxx::document::view_or_value& doc);
     void updateDocument(mongocxx::collection& collection, const std::string& deviceNickname, const bsoncxx::document::view_or_value& data);
     void deleteDocument(mongocxx::collection& collection, const std::string& deviceNickname);
+    std::vector<bsoncxx::document::value> findDocuments(
+      mongocxx::collection& collection,
+      const bsoncxx::document::view_or_value& filter,
+      const bsoncxx::document::view_or_value& projection,
+      std::optional<int> limit = std::nullopt
+    );
 
     mongocxx::collection devices_c;
     mongocxx::collection users_c;

@@ -1,6 +1,25 @@
 #include "database_handler.hpp"
+#include <bsoncxx/json.hpp>
+#include <list>
+#include <vector>
 
 MongoDB mdb;
+
+const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
+  return bsoncxx::builder::basic::make_document(
+    bsoncxx::builder::basic::kvp("_id", 0),
+    bsoncxx::builder::basic::kvp("ssh", bsoncxx::builder::basic::make_document(
+      bsoncxx::builder::basic::kvp("host", 1),
+      bsoncxx::builder::basic::kvp("port", 1),
+      bsoncxx::builder::basic::kvp("user", 1)
+    )),
+    bsoncxx::builder::basic::kvp("device", bsoncxx::builder::basic::make_document(
+      bsoncxx::builder::basic::kvp("name", 1),
+      bsoncxx::builder::basic::kvp("deviceName", 1),
+      bsoncxx::builder::basic::kvp("vendorName", 1)
+    ))
+  );
+}
 
 void ChronicleDB::addDevice(
   // General
@@ -135,4 +154,33 @@ void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
   } catch (const std::exception& e) {
     THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, e.what());
   }
+}
+
+std::vector<std::string> ChronicleDB::listDevices() {
+  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document();
+  auto results = mdb.findDocuments(mdb.devices_c, filter, ChronicleDB::MongoProjections::device());
+
+  std::vector<std::string> listOfDevices;
+
+  for (const auto r : results) {
+    listOfDevices.push_back( bsoncxx::to_json(r));
+  }
+
+  return listOfDevices;
+}
+
+std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
+  bsoncxx::builder::basic::document filter;
+
+  filter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
+
+  auto results = mdb.findDocuments(mdb.devices_c, filter.view(), ChronicleDB::MongoProjections::device());
+
+  std::string deviceData;
+
+  if (!results.empty()) {
+      deviceData = bsoncxx::to_json(results[0].view());
+  }
+
+  return deviceData;
 }

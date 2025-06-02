@@ -106,7 +106,11 @@ PYBIND11_MODULE(chronicle, m) {
         "Modify a device in the Chronicle database.")
     .def("deleteDevice", &ChronicleDB::deleteDevice,
         py::arg("deviceNickname"),
-        "Delete a device in the Chronicle database.");
+        "Delete a device in the Chronicle database.")
+    .def("getDevice", &ChronicleDB::getDevice,
+        py::arg("deviceNickname"),
+        "Get a device in the Chronicle database.")
+    .def("listDevices", &ChronicleDB::listDevices, "Lists all devices in the Chronicle database.");
 
     bind_device_loader(m);
 }

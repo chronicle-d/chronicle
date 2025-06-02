@@ -1,9 +1,10 @@
-# Delete a device
+# Get a device
 from flask import Blueprint, request
 from core.response import makeResponse
 from utils.paramHandler import validateParams
 from config.settings import API_ROUTE
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
+import json
 
 GLOBAL_SCHEMA = {
     "name": {
@@ -12,10 +13,10 @@ GLOBAL_SCHEMA = {
     }
 }
 
-my_blueprint = Blueprint("deletedevice", __name__)
+my_blueprint = Blueprint("getdevice", __name__)
 
-@my_blueprint.route(API_ROUTE + "/deleteDevice", methods=["POST"])
-def delete_device_route():
+@my_blueprint.route(API_ROUTE + "/getDevice", methods=["GET"])
+def get_device_route():
     global_error, global_data = validateParams(request.args, GLOBAL_SCHEMA)
     if global_error:
         return global_error
@@ -25,11 +26,13 @@ def delete_device_route():
     deviceNickname = global_data["name"]
 
     try:
-        ChronicleDB().deleteDevice(deviceNickname=deviceNickname)
+        raw_response = ChronicleDB().getDevice(deviceNickname=deviceNickname)
+        response = json.loads(raw_response)
+
         return makeResponse(
             True,
-            f"Deleted device {deviceNickname} succefuly.",
-            {},
+            f"Fetched device {deviceNickname} succefuly.",
+            response,
             200,
             deviceNickname
         )     
@@ -46,7 +49,7 @@ def delete_device_route():
 
         return makeResponse(
             False,
-            f"Failed to delete device {deviceNickname}.",
+            f"Failed to fetch device {deviceNickname}.",
             {"error": error},
             500,
             deviceNickname

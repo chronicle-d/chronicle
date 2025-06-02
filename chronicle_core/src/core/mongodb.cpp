@@ -144,3 +144,27 @@ void MongoDB::deleteDocument(mongocxx::collection& collection, const std::string
     THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_DELETE_DOCUMENT, fullMessage);
   }
 }
+
+std::vector<bsoncxx::document::value> MongoDB::findDocuments(
+  mongocxx::collection& collection,
+  const bsoncxx::document::view_or_value& filter,
+  const bsoncxx::document::view_or_value& projection,
+  std::optional<int> limit
+) {
+  mongocxx::options::find opts;
+
+  if (limit.has_value()) {
+      opts.limit(*limit);
+  }
+
+  opts.projection(projection);
+
+  std::vector<bsoncxx::document::value> results;
+
+  auto cursor = collection.find(filter.view(), opts);
+  for (auto&& doc : cursor) {
+      results.emplace_back(bsoncxx::document::value(doc));
+  }
+
+  return results;
+}
