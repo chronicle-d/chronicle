@@ -14,6 +14,9 @@ class ChronicleDB {
       static const bsoncxx::document::view_or_value settings();
     };
 
+    /* Global */
+    void initDB();
+
     /* Chronicle settings */
     void updateSettings(
       std::optional<int> sshIdleTimeout = CHRONICLE_CONFIG_DEFAULT_SSH_IDLE_TIMEOUT,

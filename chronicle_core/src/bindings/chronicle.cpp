@@ -1,3 +1,4 @@
+#include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -110,7 +111,17 @@ PYBIND11_MODULE(chronicle, m) {
     .def("getDevice", &ChronicleDB::getDevice,
         py::arg("deviceNickname"),
         "Get a device in the Chronicle database.")
-    .def("listDevices", &ChronicleDB::listDevices, "Lists all devices in the Chronicle database.");
+    .def("listDevices", &ChronicleDB::listDevices, "Lists all devices in the Chronicle database.")
+    
+    // Settings
+    .def("getSettings", &ChronicleDB::getSettings, "Returns the current chronicle settings.")
+    .def("updateSettings", &ChronicleDB::updateSettings,
+        py::arg("sshIdleTimeout"),
+        py::arg("sshTotalTimeout"),
+        "Updates the current chronicle settings.")
+    .def("initDB", &ChronicleDB::initDB, "Initiates the chronicle db.");
+
+
 
     bind_device_loader(m);
 }

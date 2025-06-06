@@ -30,11 +30,3 @@ def getDeviceSettings(deviceNickname: str) -> DeviceSettings:
         port=ds.port,
         verbosity=ds.verbosity,
     )
-
-def getSettings() -> ChronicleSettings:
-    cs = chronicle.getChronicleSettings()
-    
-    return ChronicleSettings(
-        sshIdleTimeout=cs.ssh_idle_timeout,
-        sshTotalTimeout=cs.ssh_total_timeout,
-    )

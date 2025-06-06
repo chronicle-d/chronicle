@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_cors import CORS
 from calls import register_all_blueprints
-from core.chronicle import initChronicleConfig
+from chronicle import ChronicleDB
 
 
 def create_app():
-    initChronicleConfig()
+    ChronicleDB().initDB()
     app = Flask(__name__)
     register_all_blueprints(app)
     return app

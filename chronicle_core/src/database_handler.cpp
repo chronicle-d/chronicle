@@ -1,9 +1,49 @@
 #include "database_handler.hpp"
-#include <bsoncxx/json.hpp>
-#include <list>
-#include <vector>
+#include "config.hpp"
+#include "error_handler.hpp"
 
 MongoDB mdb;
+
+void ChronicleDB::initDB() {
+  bsoncxx::builder::basic::document matchAllFilter{};
+
+  // Settings
+  auto settingsExisting = mdb.findDocuments(
+    mdb.settings_c,
+    matchAllFilter.view(),
+    ChronicleDB::MongoProjections::settings(),
+    1
+  );
+  
+  if (settingsExisting.empty()) {
+    bsoncxx::builder::basic::document settingsDoc;
+
+    settingsDoc.append(
+      bsoncxx::builder::basic::kvp(
+        "ssh",
+        bsoncxx::builder::basic::make_document(
+          bsoncxx::builder::basic::kvp("sshIdleTimeout", CHRONICLE_CONFIG_DEFAULT_SSH_IDLE_TIMEOUT),
+          bsoncxx::builder::basic::kvp("sshTotalTimeout", CHRONICLE_CONFIG_DEFAULT_SSH_TOTAL_TIMEOUT)
+        )
+      )
+    );
+
+    try {
+      mdb.insertDocument(mdb.settings_c, settingsDoc.view());
+    } catch (const ChronicleException& e) {
+
+      std::string fullMessage;
+
+      fullMessage =
+        "Chronicle exception:\n"
+        "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+        "Details: " + e.getDetails();
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+    } catch (const std::exception& e) {
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, e.what());
+    } 
+  }
+}
 
 const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
   return bsoncxx::builder::basic::make_document(
@@ -47,8 +87,8 @@ void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optiona
     std::string fullMessage;
 
     if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
-      fullMessage = "No settings found for chroniucle.";
-      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+      fullMessage = "No settings found for chronicle, cannot modify.";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT, fullMessage);
     }
 
     fullMessage =
@@ -65,9 +105,14 @@ std::string ChronicleDB::getSettings() {
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
   auto results = mdb.findDocuments(mdb.settings_c, filter, ChronicleDB::MongoProjections::settings());
 
-  std::string settings = bsoncxx::to_json(results[0].view());
+  if (results.empty()) {
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT, "No Chronicle settings found in database.");
+  }
 
-  return settings;
+  std::cout << "[DEBUG] result count: " << results.size() << std::endl;
+  std::cout << "[DEBUG] raw json: " << bsoncxx::to_json(results[0].view()) << std::endl;
+
+  return bsoncxx::to_json(results[0].view());
 }
 
 /* Devices */

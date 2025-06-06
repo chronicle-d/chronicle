@@ -32,6 +32,7 @@ std::string getErrorMsg(int internal_exit_code) {
         case CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED: return "Failed while trying to add";
         case CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED: return "Failed while trying to modify";
         case CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED: return "Failed while trying to delete";
+        case CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT: return "Faild while trying to access a non-exitant document";
 
         default: return "Unknown error.";
     }
