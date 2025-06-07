@@ -6,6 +6,7 @@ __pycache__/
 chronicle_core/build/
 chronicle_core/bin/
 chronicle_core/compile_commands.json
+chronicle_core/.cache/
 
 # Node modules and generated files
 chronicle_web_ui/node_modules/

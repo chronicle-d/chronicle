@@ -1,10 +1,9 @@
-# Get a device configuration
+# Delete a device
 from flask import Blueprint, request
 from core.response import makeResponse
 from utils.paramHandler import validateParams
-from config.settings import API_ROUTE, DEVICES_BASE
-from chronicle import ChronicleException, getErrorMsg, getConnectionInfo, loadDeviceOps, getConfig
-import os
+from config.settings import API_ROUTE
+from chronicle import ChronicleDB, ChronicleException, getErrorMsg
 
 GLOBAL_SCHEMA = {
     "name": {
@@ -13,10 +12,10 @@ GLOBAL_SCHEMA = {
     }
 }
 
-my_blueprint = Blueprint("getdeviceconfig", __name__)
+my_blueprint = Blueprint("deletedevice", __name__)
 
-@my_blueprint.route(API_ROUTE + "/getDeviceConfig", methods=["GET"])
-def get_device_config_route():
+@my_blueprint.route(API_ROUTE + "/deleteDevice", methods=["POST"])
+def delete_device_route():
     global_error, global_data = validateParams(request.args, GLOBAL_SCHEMA)
     if global_error:
         return global_error
@@ -26,28 +25,14 @@ def get_device_config_route():
     deviceNickname = global_data["name"]
 
     try:
-        deviceSettings = getConnectionInfo(deviceNickname)
-        deviceMapPath = os.path.join(
-            DEVICES_BASE, deviceSettings.vendorName, deviceSettings.deviceName + ".cld"
-        )
-
-        DeviceOperationalMap = loadDeviceOps(
-            deviceMapPath, deviceSettings.device, deviceSettings.vendor
-        )
-
-        deviceConfig = getConfig(
-            deviceSettings, DeviceOperationalMap.ops.getConfig
-        )
-
+        ChronicleDB().deleteDevice(deviceNickname=deviceNickname)
         return makeResponse(
             True,
-            "Fetched device configuration succesfuly",
-            {
-                "config": deviceConfig
-            },
+            f"Deleted device {deviceNickname} succefuly.",
+            {},
             200,
             deviceNickname
-        )
+        )     
     except (ChronicleException, Exception) as e:
         error = {}
         if isinstance(e, ChronicleException):
@@ -61,7 +46,7 @@ def get_device_config_route():
 
         return makeResponse(
             False,
-            "Failed to fetch device configuration",
+            f"Failed to delete device {deviceNickname}.",
             {"error": error},
             500,
             deviceNickname

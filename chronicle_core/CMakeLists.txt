@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.15...3.29)
+project(chronicle LANGUAGES CXX)
+
+# General settings
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-project(chronicle LANGUAGES C CXX)
 
 # Output directories
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -9,8 +15,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
-    ${CMAKE_SOURCE_DIR}/3party/inih
-    ${CMAKE_SOURCE_DIR}/3party/inih/cpp
     /usr/include/libssh
 )
 
@@ -18,6 +22,11 @@ include_directories(
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(libssh CONFIG REQUIRED)
+
+find_package(mongoc CONFIG REQUIRED)
+find_package(bson CONFIG REQUIRED)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 # Fallback in case CMake can't find the lib directly
 find_library(LIBSSH_LIBRARY NAMES ssh PATHS /usr/lib/x86_64-linux-gnu /usr/lib /usr/local/lib REQUIRED)
@@ -41,20 +50,14 @@ pybind11_add_module(chronicle
     src/core/error_handler.cpp
     src/core/ssh.cpp
     src/core/config.cpp
+    src/core/mongodb.cpp
+    src/database_handler.cpp
     src/core/device_factory.cpp
     src/bindings/chronicle.cpp
     src/bindings/devices.cpp
-    3party/inih/ini.c
-    3party/inih/cpp/INIReader.cpp
 )
 
-set_source_files_properties(
-    3party/inih/ini.c
-    PROPERTIES
-    LANGUAGE C
-)
-
-target_link_libraries(chronicle PRIVATE ${LIBSSH_LIBRARY})
+target_link_libraries(chronicle PRIVATE ${LIBSSH_LIBRARY} mongo::mongocxx_shared mongo::bsoncxx_shared)
 
 set_target_properties(chronicle PROPERTIES
     OUTPUT_NAME "chronicle"

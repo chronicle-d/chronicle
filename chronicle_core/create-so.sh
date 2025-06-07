@@ -7,6 +7,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+MODE="${1:-0}"
+
 # Configuration
 BUILD_DIR="build"
 TARGET_BINARY="bin/chronicle.so"
@@ -23,6 +25,11 @@ function error_exit {
   echo -e "\033[1;31m[ERROR]\033[0m $*" >&2
   exit 1
 }
+
+if [ "${MODE}" -ge 1 ]; then
+	info "Removing old build directory..."
+	rm -rf "${BUILD_DIR}"
+fi
 
 # Build process
 info "Creating build directory..."

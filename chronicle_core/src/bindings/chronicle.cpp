@@ -1,9 +1,12 @@
+#include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "core/config.hpp"
 #include "core/chronicle.hpp"
 #include "core/error_handler.hpp"
+#include "database_handler.hpp"
+#include "core/mongodb.hpp"
 
 namespace py = pybind11;
 
@@ -36,17 +39,6 @@ PYBIND11_MODULE(chronicle, m) {
 
     m.def("getErrorMsg", &getErrorMsg, "Returns the message of a given error code.");
 
-    // INI config support
-    m.def("readChronicleConfig", &readChronicleConfig, "Reads the Chronicle configuration file.");
-
-    py::class_<INIReader>(m, "Config")
-        .def("Get", &INIReader::Get)
-        .def("GetInteger", &INIReader::GetInteger)
-        .def("GetBoolean", &INIReader::GetBoolean)
-        .def("Sections", &INIReader::Sections);
-
-    m.attr("config") = py::cast(&chronicleConfig, py::return_value_policy::reference);
-
     m.def("getConnectionInfo", &getConnectionInfo, "Get connectionInfo for a given config section.");
     m.def("getChronicleSettings", &getChronicleSettings, "Get chronicleSettings from config.");
 
@@ -55,6 +47,8 @@ PYBIND11_MODULE(chronicle, m) {
         .def(py::init<>())
         .def_readwrite("vendor", &connectionInfo::vendor)
         .def_readwrite("device", &connectionInfo::device)
+        .def_readwrite("deviceName", &connectionInfo::deviceName)
+        .def_readwrite("vendorName", &connectionInfo::vendorName)
         .def_readwrite("user", &connectionInfo::user)
         .def_readwrite("password", &connectionInfo::password)
         .def_readwrite("host", &connectionInfo::host)
@@ -69,7 +63,56 @@ PYBIND11_MODULE(chronicle, m) {
         .def_readwrite("ssh_idle_timeout", &chronicleSettings::ssh_idle_timeout)
         .def_readwrite("ssh_total_timeout", &chronicleSettings::ssh_total_timeout);
 
-    m.def("getConfig", &getConfig, "Returns the current device configuration.");
+    m.def("getConfig", &getConfig, 
+          py::arg("ConnectionInfo"),
+          py::arg("OperationMap"),
+          "Returns the current device configuration.");
+
+    // ChronicleDB
+    // - Devices
+    py::class_<ChronicleDB>(m, "ChronicleDB")
+    .def(py::init<>())
+    .def("addDevice", &ChronicleDB::addDevice,
+        py::arg("deviceNickname"),
+        py::arg("deviceName"),
+        py::arg("vendor"),
+        py::arg("user"),
+        py::arg("password"),
+        py::arg("host"),
+        py::arg("port") = CHRONICLE_CONFIG_DEFUALT_PORT,
+        py::arg("sshVerbosity") = 0,
+        py::arg("kexMethods") = CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
+        py::arg("hostkeyAlgorithms") = CHRONICLE_CONFIG_DEFUALT_HOSTKEYS,
+        "Add a new device to the Chronicle database.")
+    .def("modifyDevice", &ChronicleDB::modifyDevice,
+        py::arg("deviceNickname"),
+        py::arg("deviceName"),
+        py::arg("vendor"),
+        py::arg("user"),
+        py::arg("password"),
+        py::arg("host"),
+        py::arg("port"),
+        py::arg("sshVerbosity"),
+        py::arg("kexMethods"),
+        py::arg("hostkeyAlgorithms"),
+        "Modify a device in the Chronicle database.")
+    .def("deleteDevice", &ChronicleDB::deleteDevice,
+        py::arg("deviceNickname"),
+        "Delete a device in the Chronicle database.")
+    .def("getDevice", &ChronicleDB::getDevice,
+        py::arg("deviceNickname"),
+        "Get a device in the Chronicle database.")
+    .def("listDevices", &ChronicleDB::listDevices, "Lists all devices in the Chronicle database.")
+    
+    // Settings
+    .def("getSettings", &ChronicleDB::getSettings, "Returns the current chronicle settings.")
+    .def("updateSettings", &ChronicleDB::updateSettings,
+        py::arg("sshIdleTimeout"),
+        py::arg("sshTotalTimeout"),
+        "Updates the current chronicle settings.")
+    .def("initDB", &ChronicleDB::initDB, "Initiates the chronicle db.");
+
+
 
     bind_device_loader(m);
 }
