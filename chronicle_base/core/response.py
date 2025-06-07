@@ -1,6 +1,6 @@
 from flask import jsonify, make_response as flask_response
-from core.chronicle import getDeviceSettings
 from flask import Response
+from chronicle import getConnectionInfo
 
 def makeResponse(success: bool, message: str, data, status: int, deviceNickname: str="") -> Response:
     body = {}
@@ -8,7 +8,7 @@ def makeResponse(success: bool, message: str, data, status: int, deviceNickname:
 
     if deviceNickname:
         try:
-            deviceSettings = getDeviceSettings(deviceNickname)
+            deviceSettings = getConnectionInfo(deviceNickname)
             data.update({
                 "name": deviceNickname,
                 "ssh": {

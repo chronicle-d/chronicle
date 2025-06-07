@@ -23,7 +23,7 @@ GLOBAL_SCHEMA = {
     }
 }
 
-@my_blueprint.route(API_ROUTE + "/updateSettings", methods=["GET"])
+@my_blueprint.route(API_ROUTE + "/updateSettings", methods=["POST"])
 def update_settings_route():
     global_error, global_data = validateParams(request.args, GLOBAL_SCHEMA)
     if global_error:

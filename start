@@ -5,6 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 CHRONICLE_WEB_UI="${SCRIPT_DIR}/chronicle_web_ui"
 CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base"
+serviceUp=true
 
 # Check directories
 [[ -d "$CHRONICLE_WEB_UI" ]] || {
@@ -28,6 +29,7 @@ command -v flask >/dev/null || {
 
 # Cleanup function to kill background jobs
 cleanup() {
+  serviceUp=false
   echo "Shutting down..."
   pkill -P $$ || true # Kill all child processes of this script
   wait
@@ -49,6 +51,18 @@ sleep 1
 clear
 
 echo -e "\033[1;97m • Serving Chronicle at:\033[0m \033[4;36mhttp://localhost:3000/\033[0m\n"
+
+while $serviceUp; do
+  echo -en "  \033[1;97m>\033[0m "
+  read CMDLINE
+
+  if [ "${CMDLINE}" == "quit" ]; then
+    cleanup
+  elif [ -n "${CMDLINE}" ]; then
+    ./ChronicleCLI -C ${CMDLINE}
+    echo
+  fi
+done
 
 # Wait for background jobs
 wait

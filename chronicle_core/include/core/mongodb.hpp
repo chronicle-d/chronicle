@@ -20,6 +20,8 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/document/view.hpp>
 
 #include <mongocxx/collection.hpp>
 #include <mongocxx/database.hpp>

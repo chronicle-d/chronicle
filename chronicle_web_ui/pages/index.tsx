@@ -1,55 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Loader2, Settings, HardDrive, ChevronDown, Home } from 'lucide-react';
 import Head from 'next/head';
+import Link from 'next/link';
+import {
+  Loader2, Home, Settings, HardDrive, PlusCircle, Edit3, Trash2, Save, CheckCircle, Menu
+} from 'lucide-react';
 
 const API_BASE = 'http://127.0.0.1:5000/api';
 
 export default function ChronicleDashboard() {
+  const [tab, setTab] = useState('home');
   const [devices, setDevices] = useState([]);
   const [featured, setFeatured] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [deviceSettings, setDeviceSettings] = useState(null);
-  const [deviceConfig, setDeviceConfig] = useState(null);
   const [settings, setSettings] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [errors, setErrors] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [settingsChanged, setSettingsChanged] = useState({});
+  const [modal, setModal] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     fetchDevices();
-    fetchChronicleSettings();
+    fetchSettings();
   }, []);
-
-  const showError = (input) => {
-    if (!input) return;
-    const responseData = input?.response?.data;
-    const err = responseData?.data?.error;
-    const code = err?.code;
-    const codeMessage = err?.codeMessage;
-    const details = err?.details;
-    const fallbackMessage = responseData?.message || input?.message;
-
-    let content = '';
-    if (code && codeMessage) {
-      content += `Error ${code}: ${codeMessage}`;
-      if (details) content += `\n\n${details}`;
-    } else if (details) {
-      content = details;
-    } else if (fallbackMessage) {
-      content = fallbackMessage;
-    } else {
-      content = typeof input === 'string' ? input : JSON.stringify(input, null, 2);
-    }
-
-    const id = Date.now();
-    setErrors((prev) => [...prev, { id, content }]);
-    setTimeout(() => {
-      setErrors((prev) => prev.filter((e) => e.id !== id));
-    }, 5000);
-  };
 
   const fetchDevices = async () => {
     try {
@@ -57,49 +29,73 @@ export default function ChronicleDashboard() {
       if (res.data.success) {
         setDevices(res.data.data.devices);
         setFeatured(res.data.data.devices.slice(0, 2));
-      } else {
-        showError(res);
       }
-    } catch (err) {
-      showError(err);
+    } catch (e) {
+      toastError(e);
     }
   };
 
-  const fetchChronicleSettings = async () => {
+  const fetchSettings = async () => {
     try {
       const res = await axios.get(`${API_BASE}/getSettings`);
-      if (res.data.success) setSettings(res.data.data);
-    } catch (err) {
-      showError(err);
+      if (res.data.success) setSettings(res.data.data.settings);
+    } catch (e) {
+      toastError(e);
     }
   };
 
-  const selectDevice = async (deviceName) => {
-    setShowSettings(false);
-    setSelectedDevice(deviceName);
-    setDeviceSettings(null);
-    setDeviceConfig(null);
-    setDropdownOpen(false);
+  const toastSuccess = (msg) => {
+    setToast({ type: 'success', msg });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const toastError = (e) => {
+    const msg = e?.response?.data?.message || 'Unknown error';
+    setToast({ type: 'error', msg });
+    setTimeout(() => setToast(null), 5000);
+  };
+
+  const saveSettings = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/getDevice?name=${deviceName}`);
-      if (res.data.success) setDeviceSettings(res.data.data);
-      else showError(res);
-    } catch (err) {
-      showError(err);
+      await axios.post(`${API_BASE}/updateSettings`, null, { params: settingsChanged });
+      toastSuccess('Settings updated');
+      setSettingsChanged({});
+      fetchSettings();
+    } catch (e) {
+      toastError(e);
     }
   };
 
-  const fetchDeviceConfig = async () => {
-    setDeviceConfig(null);
-    setLoading(true);
+  const deleteDevice = async (name) => {
     try {
-      const res = await axios.get(`${API_BASE}/getDeviceConfig?name=${selectedDevice}`);
-      if (res.data.success) setDeviceConfig(res.data.data);
-      else showError(res);
-    } catch (err) {
-      showError(err);
+      await axios.post(`${API_BASE}/deleteDevice?name=${name}`);
+      toastSuccess('Device deleted');
+      fetchDevices();
+    } catch (e) {
+      toastError(e);
     }
-    setLoading(false);
+  };
+
+  const submitDevice = async () => {
+    const { type, data } = modal;
+    try {
+      if (type === 'modify') {
+        const res = await axios.get(`${API_BASE}/getDevice`, { params: { name: data.name } });
+        if (res.data.success) {
+          const fullData = { ...res.data.data.device, ...res.data.data.ssh };
+          const updatedData = { ...fullData, ...data };
+          await axios.post(`${API_BASE}/manageDevice?action=modify`, null, { params: updatedData });
+          toastSuccess('Device updated');
+        }
+      } else {
+        await axios.post(`${API_BASE}/manageDevice?action=create`, null, { params: data });
+        toastSuccess('Device added');
+      }
+      fetchDevices();
+      setModal(null);
+    } catch (e) {
+      toastError(e);
+    }
   };
 
   return (
@@ -109,116 +105,119 @@ export default function ChronicleDashboard() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <aside className={`${sidebarCollapsed ? 'w-[56px]' : 'w-64'} fixed top-0 left-0 z-40 h-full transition-all duration-300 bg-gray-900 text-white p-3 flex flex-col space-y-4 shadow-lg`}>
-        <div className="flex items-center justify-between">
-          <h1 className={`text-2xl font-bold tracking-tight mb-6 ${sidebarCollapsed ? 'hidden' : 'block'}`}>Chronicle</h1>
-          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-white focus:outline-none ml-auto">
-            {sidebarCollapsed ? '»' : '«'}
-          </button>
-        </div>
-        <button className="text-left px-3 py-2 text-white hover:bg-gray-800 bg-gray-700 rounded" onClick={() => { setShowSettings(false); setSelectedDevice(null); }}>
-          <Home className="inline mr-2" size={18} /> {!sidebarCollapsed && 'Home'}
-        </button>
-        <button className="text-left px-3 py-2 text-white hover:bg-gray-800 bg-gray-700 rounded" onClick={() => { setShowSettings(true); setSelectedDevice(null); setDeviceConfig(null); }}>
-          <Settings className="inline mr-2" size={18} /> {!sidebarCollapsed && 'Settings'}
-        </button>
-        <div className="relative">
-          <button className="w-full text-left px-3 py-2 text-white hover:bg-gray-800 bg-gray-700 rounded" onClick={() => setDropdownOpen(!dropdownOpen)}>
-            <HardDrive className="inline mr-2" size={18} /> {!sidebarCollapsed && 'Devices'} <ChevronDown className="inline ml-auto" size={16} />
-          </button>
-          {dropdownOpen && (
-            <div className={`absolute left-0 top-full mt-2 bg-gray-800 border border-gray-700 rounded text-sm z-50 min-w-full ${sidebarCollapsed ? 'ml-2' : ''}`}>
-              <ul>
-                {devices.map((d) => (
-                  <li key={d}>
-                    <button onClick={() => selectDevice(d)} className="w-full text-left px-4 py-2 hover:bg-gray-700">
-                      {d}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-md shadow-md">
+        <Menu size={20} />
+      </button>
+
+      {sidebarOpen && (
+        <aside className="w-64 fixed top-0 left-0 h-full bg-gray-900 text-white p-4 shadow-lg z-40">
+          <h1 className="text-2xl font-bold mb-6">Chronicle</h1>
+          <nav className="space-y-2">
+            <button onClick={() => setTab('home')} className={`w-full text-left px-4 py-2 rounded ${tab === 'home' ? 'bg-blue-700' : 'hover:bg-gray-800'}`}><Home size={16} className="inline mr-2" /> Home</button>
+            <button onClick={() => setTab('devices')} className={`w-full text-left px-4 py-2 rounded ${tab === 'devices' ? 'bg-blue-700' : 'hover:bg-gray-800'}`}><HardDrive size={16} className="inline mr-2" /> Devices</button>
+            <button onClick={() => setTab('settings')} className={`w-full text-left px-4 py-2 rounded ${tab === 'settings' ? 'bg-blue-700' : 'hover:bg-gray-800'}`}><Settings size={16} className="inline mr-2" /> Settings</button>
+          </nav>
+        </aside>
+      )}
+
+      <main className="flex-1 ml-64 p-6">
+        {toast && (
+          <div className={`mb-4 px-4 py-2 rounded ${toast.type === 'success' ? 'bg-green-100 text-green-800 border border-green-400' : 'bg-red-100 text-red-800 border border-red-400'}`}>{toast.msg}</div>
+        )}
+
+        {tab === 'home' && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Featured Devices</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {featured.map((dev, i) => (
+                <Link key={i} href={`/device/${dev.device.name}`} className="border p-4 rounded bg-white shadow block">
+                  <h3 className="font-semibold">{dev.device.name}</h3>
+                  <p className="text-sm text-gray-600">{dev.device.vendorName} • {dev.device.deviceName}</p>
+                </Link>
+              ))}
             </div>
-          )}
-        </div>
-      </aside>
+          </div>
+        )}
 
-      <main className={`flex-1 overflow-y-auto transition-all duration-300 ${sidebarCollapsed ? 'ml-[56px]' : 'ml-64'} flex justify-center items-start px-8 py-12`}>
-        <div className="w-full max-w-4xl">
-
-          {/* Error Banner */}
-          {errors.map((err) => (
-            <div key={err.id} className="fixed top-2 right-2 z-50 bg-red-500/80 backdrop-blur-sm text-white px-6 py-4 rounded shadow text-sm font-mono whitespace-pre-wrap border border-red-600 flex items-start gap-2 w-[420px] max-w-[calc(100vw-2rem)]">
-              <span className="text-lg leading-none mt-0.5">⚠️</span>
-              <div className="flex-1 text-left">
-                {err.content.split('\n').map((line, i) => (
-                  <div key={i} className={i === 0 ? 'font-semibold mb-1 text-base' : 'text-sm text-white/90'}>
-                    {line}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => setErrors(errors.filter((e) => e.id !== err.id))}
-                className="text-white font-bold ml-2 self-start"
-              >
-                ×
+        {tab === 'devices' && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Devices</h2>
+              <button onClick={() => setModal({ type: 'create', data: { name: '', device: '', vendor: '', user: '', password: '', host: '', port: '' } })} className="bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center">
+                <PlusCircle className="mr-2" size={16} /> Add Device
               </button>
             </div>
-          ))}
+            <table className="w-full bg-white shadow rounded overflow-hidden">
+              <thead className="bg-gray-100 text-left text-sm">
+                <tr>
+                  <th className="p-3">Name</th>
+                  <th className="p-3">Vendor</th>
+                  <th className="p-3">Model</th>
+                  <th className="p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {devices.map((d, i) => (
+                  <tr key={i} className="border-t text-sm">
+                    <td className="p-3">
+                      <Link href={`/device/${d.device.name}`} className="text-blue-600 hover:underline">{d.device.name}</Link>
+                    </td>
+                    <td className="p-3">{d.device.vendorName}</td>
+                    <td className="p-3">{d.device.deviceName}</td>
+                    <td className="p-3 space-x-2">
+                      <button onClick={() => fetch(`${API_BASE}/getDevice?name=${d.device.name}`).then(res => res.json()).then(res => {
+                        if (res.success) {
+                          const fullData = { ...res.data.device, ...res.data.ssh };
+                          setModal({ type: 'modify', data: fullData });
+                        }
+                      })} className="text-blue-600"><Edit3 size={16} /></button>
+                      <button onClick={() => deleteDevice(d.device.name)} className="text-red-600"><Trash2 size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-          {showSettings && settings && (
-            <div className="mt-4">
-              <h2 className="text-2xl font-semibold mb-4">Chronicle Settings</h2>
-              <div className="bg-gray-100 border p-4 rounded text-sm space-y-2">
-                <div><strong>Idle Timeout:</strong> {settings.ssh.sshIdleTimeout} ms</div>
-                <div><strong>Total Timeout:</strong> {settings.ssh.sshTotalTimeout} ms</div>
-              </div>
-            </div>
-          )}
-
-          {selectedDevice && deviceSettings && (
-            <div className="mt-6">
-              <h2 className="text-2xl font-semibold mb-4">Device: {selectedDevice}</h2>
-              <div className="bg-gray-50 border p-4 rounded space-y-2 text-sm">
-                <div><strong>Device:</strong> {deviceSettings.device.deviceName} ({deviceSettings.device.vendorName})</div>
-                <div><strong>Host:</strong> {deviceSettings.ssh.host}</div>
-                <div><strong>User:</strong> {deviceSettings.ssh.user}</div>
-                <div><strong>Port:</strong> {deviceSettings.ssh.port}</div>
-              </div>
-              <div className="mt-4 flex justify-center">
-                <button onClick={fetchDeviceConfig} disabled={loading} className="px-6 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded">
-                  {loading ? (
-                    <>
-                      <Loader2 className="animate-spin h-5 w-5 text-white mr-2" />
-                      Fetching...
-                    </>
-                  ) : 'Fetch Configuration'}
-                </button>
-              </div>
-              {deviceConfig && (
-                <div className="mt-4 max-h-[400px] overflow-y-auto bg-gray-900 text-green-400 font-mono p-4 rounded">
-                  {deviceConfig.config.map((line, idx) => (<div key={idx}>{line}</div>))}
+        {tab === 'settings' && settings && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Settings</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {Object.entries(settings.ssh).map(([k, v]) => (
+                <div key={k} className="flex flex-col">
+                  <label htmlFor={`setting-${k}`} className="text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
+                  <input id={`setting-${k}`} name={k} title={k} defaultValue={v} placeholder={k} onChange={(e) => setSettingsChanged({ ...settingsChanged, [k]: e.target.value })} className="border px-3 py-2 rounded" />
                 </div>
-              )}
+              ))}
             </div>
-          )}
+            <button disabled={Object.keys(settingsChanged).length === 0} onClick={saveSettings} className={`mt-4 px-4 py-2 rounded ${Object.keys(settingsChanged).length ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+              <Save className="inline mr-2" size={16} /> Save Changes
+            </button>
+          </div>
+        )}
 
-          {!showSettings && !selectedDevice && featured.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Featured Devices</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {featured.map((dev, idx) => (
-                  <div key={idx} onClick={() => selectDevice(dev.name)} className="hover:scale-[1.01] transition-transform">
-                    <div className="bg-white border rounded-lg shadow p-4">
-                      <h3 className="text-lg font-bold mb-2">{dev.name}</h3>
-                      <p className="text-sm text-gray-600">Model: <span className="font-medium">{dev.device.deviceName}</span></p>
-                      <p className="text-sm text-gray-600">Vendor: <span className="font-medium">{dev.device.vendorName}</span></p>
-                    </div>
+        {modal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow max-w-md w-full">
+              <h3 className="text-lg font-semibold mb-4">{modal.type === 'create' ? 'Add Device' : 'Modify Device'}</h3>
+              <div className="grid gap-2 mb-4">
+                {Object.entries(modal.data).map(([k, v]) => (
+                  <div key={k} className="flex flex-col">
+                    <label htmlFor={`field-${k}`} className="text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
+                    <input id={`field-${k}`} name={k} title={k} placeholder={k} value={v || ''} onChange={(e) => setModal({ ...modal, data: { ...modal.data, [k]: e.target.value } })} className="border px-3 py-1 rounded" />
                   </div>
                 ))}
               </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setModal(null)} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+                <button onClick={submitDevice} className="px-4 py-2 bg-blue-600 text-white rounded">
+                  <Save className="inline mr-2" size={16} /> Save
+                </button>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );

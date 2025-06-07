@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15...3.29)
-project(chronicle LANGUAGES C CXX)
+project(chronicle LANGUAGES CXX)
 
 # General settings
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
@@ -15,8 +15,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
-    ${CMAKE_SOURCE_DIR}/3party/inih
-    ${CMAKE_SOURCE_DIR}/3party/inih/cpp
     /usr/include/libssh
 )
 
@@ -57,14 +55,6 @@ pybind11_add_module(chronicle
     src/core/device_factory.cpp
     src/bindings/chronicle.cpp
     src/bindings/devices.cpp
-    3party/inih/ini.c
-    3party/inih/cpp/INIReader.cpp
-)
-
-set_source_files_properties(
-    3party/inih/ini.c
-    PROPERTIES
-    LANGUAGE C
 )
 
 target_link_libraries(chronicle PRIVATE ${LIBSSH_LIBRARY} mongo::mongocxx_shared mongo::bsoncxx_shared)

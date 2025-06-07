@@ -39,17 +39,6 @@ PYBIND11_MODULE(chronicle, m) {
 
     m.def("getErrorMsg", &getErrorMsg, "Returns the message of a given error code.");
 
-    // INI config support
-    m.def("readChronicleConfig", &readChronicleConfig, "Reads the Chronicle configuration file.");
-
-    py::class_<INIReader>(m, "Config")
-        .def("Get", &INIReader::Get)
-        .def("GetInteger", &INIReader::GetInteger)
-        .def("GetBoolean", &INIReader::GetBoolean)
-        .def("Sections", &INIReader::Sections);
-
-    m.attr("config") = py::cast(&chronicleConfig, py::return_value_policy::reference);
-
     m.def("getConnectionInfo", &getConnectionInfo, "Get connectionInfo for a given config section.");
     m.def("getChronicleSettings", &getChronicleSettings, "Get chronicleSettings from config.");
 
@@ -58,6 +47,8 @@ PYBIND11_MODULE(chronicle, m) {
         .def(py::init<>())
         .def_readwrite("vendor", &connectionInfo::vendor)
         .def_readwrite("device", &connectionInfo::device)
+        .def_readwrite("deviceName", &connectionInfo::deviceName)
+        .def_readwrite("vendorName", &connectionInfo::vendorName)
         .def_readwrite("user", &connectionInfo::user)
         .def_readwrite("password", &connectionInfo::password)
         .def_readwrite("host", &connectionInfo::host)

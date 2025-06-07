@@ -1,5 +1,4 @@
 #include "database_handler.hpp"
-#include "config.hpp"
 #include "error_handler.hpp"
 
 MongoDB mdb;
@@ -51,7 +50,11 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
     bsoncxx::builder::basic::kvp("ssh", bsoncxx::builder::basic::make_document(
       bsoncxx::builder::basic::kvp("host", 1),
       bsoncxx::builder::basic::kvp("port", 1),
-      bsoncxx::builder::basic::kvp("user", 1)
+      bsoncxx::builder::basic::kvp("user", 1),
+      bsoncxx::builder::basic::kvp("password", 1),
+      bsoncxx::builder::basic::kvp("verbosity", 1),
+      bsoncxx::builder::basic::kvp("kexMethods", 1),
+      bsoncxx::builder::basic::kvp("hostkeyAlgorithms", 1)
     )),
     bsoncxx::builder::basic::kvp("device", bsoncxx::builder::basic::make_document(
       bsoncxx::builder::basic::kvp("name", 1),
@@ -109,9 +112,6 @@ std::string ChronicleDB::getSettings() {
       THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT, "No Chronicle settings found in database.");
   }
 
-  std::cout << "[DEBUG] result count: " << results.size() << std::endl;
-  std::cout << "[DEBUG] raw json: " << bsoncxx::to_json(results[0].view()) << std::endl;
-
   return bsoncxx::to_json(results[0].view());
 }
 
@@ -138,6 +138,7 @@ void ChronicleDB::addDevice(
       bsoncxx::builder::basic::kvp("name", deviceNickname),
       bsoncxx::builder::basic::kvp("deviceName", deviceName),
       bsoncxx::builder::basic::kvp("vendorName", vendor)
+      
     ))
   );
 
@@ -147,6 +148,7 @@ void ChronicleDB::addDevice(
       bsoncxx::builder::basic::kvp("password", password),
       bsoncxx::builder::basic::kvp("host", host),
       bsoncxx::builder::basic::kvp("port", port),
+      bsoncxx::builder::basic::kvp("verbosity", sshVerbosity),
       bsoncxx::builder::basic::kvp("kexMethods", kexMethods),
       bsoncxx::builder::basic::kvp("hostkeyAlgorithms", hostkeyAlgorithms)
     ))
@@ -201,7 +203,7 @@ void ChronicleDB::modifyDevice(
   if (password)           updateDoc.append(bsoncxx::builder::basic::kvp("ssh.password", *password));
   if (host)               updateDoc.append(bsoncxx::builder::basic::kvp("ssh.host", *host));
   if (port)               updateDoc.append(bsoncxx::builder::basic::kvp("ssh.port", *port));
-  if (sshVerbosity)       updateDoc.append(bsoncxx::builder::basic::kvp("ssh.sshVerbosity", *sshVerbosity));
+  if (sshVerbosity)       updateDoc.append(bsoncxx::builder::basic::kvp("ssh.verbosity", *sshVerbosity));
   if (kexMethods)         updateDoc.append(bsoncxx::builder::basic::kvp("ssh.kexMethods", *kexMethods));
   if (hostkeyAlgorithms)  updateDoc.append(bsoncxx::builder::basic::kvp("ssh.hostkeyAlgorithms", *hostkeyAlgorithms));
 
@@ -285,4 +287,29 @@ std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
   }
 
   return deviceData;
+}
+
+bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNickname) {
+  bsoncxx::builder::basic::document filter;
+
+  filter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
+
+  auto results = mdb.findDocuments(mdb.devices_c, filter.view(), ChronicleDB::MongoProjections::device());
+
+  if (results.empty()) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT, "Device not found.");
+  }
+
+  return bsoncxx::document::value(results[0]);
+ }
+
+bsoncxx::document::value ChronicleDB::getSettingsBson() {
+  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
+  auto results = mdb.findDocuments(mdb.settings_c, filter, ChronicleDB::MongoProjections::settings());
+
+  if (results.empty()) {
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_NX_DOCUMENT, "No Chronicle settings found in database.");
+  }
+
+  return bsoncxx::document::value(results[0]);
 }

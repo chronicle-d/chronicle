@@ -1,7 +1,7 @@
 #ifndef CHRONICLE_DATABASE_HANDLER_HPP
 #define CHRONICLE_DATABASE_HANDLER_HPP
 
-#include "config.hpp"
+#include "core/config.hpp"
 #include "core/mongodb.hpp"
 #include "core/error_handler.hpp"
 #include <optional>
@@ -61,5 +61,10 @@ class ChronicleDB {
     void deleteDevice(const std::string& deviceNickname);
     std::vector<std::string> listDevices();
     std::string getDevice(const std::string& deviceNickname);
+
+    // C++ Internal methods
+    bsoncxx::document::value getDeviceBson(const std::string& deviceNickname);
+    bsoncxx::document::value getSettingsBson();
+    
 };
 #endif // CHRONICLE_DATABASE_HANDLER_HPP
