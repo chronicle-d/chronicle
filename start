@@ -1,5 +1,49 @@
 #!/bin/bash
 
+ANSI_BLACK="\e[30m"
+ANSI_BLACK_BACKGROUND="\e[40m"
+ANSI_RED="\e[31m"
+ANSI_RED_BACKGROUND="\e[41m"
+ANSI_GREEN="\e[32m"
+ANSI_GREEN_BACKGROUND="\e[42m"
+ANSI_BROWN="\e[33m"
+ANSI_BROWN_BACKGROUND="\e[43m"
+ANSI_BLUE="\e[34m"
+ANSI_BLUE_BACKGROUND="\e[44m"
+ANSI_PURPLE="\e[35m"
+ANSI_PURPLE_BACKGROUND="\e[45m"
+ANSI_CYAN="\e[36m"
+ANSI_CYAN_BACKGROUND="\e[46m"
+ANSI_GREY="\e[37m"
+ANSI_GREY_BACKGROUND="\e[47m"
+
+## Style
+ANSI_BOLD="\e[1m"
+ANSI_ITALIAN="\e[3m"
+ANSI_UNDERLINE="\e[4m"
+ANSI_BLINK="\e[5m"
+ANSI_REVERSED_VIDEO="\e[7m"
+ANSI_STRIKETHROUGH="\e[9m"
+ANSI_END="\e[0m"
+
+echo -e " ${ANSI_BOLD}${ANSI_UNDERLINE}${ANSI_ITALIAN}${ANSI_BLUE}Chronicle:${ANSI_END}\n"
+
+function inform {
+  TYPE="$1"
+  shift
+  case "$TYPE" in
+    0)
+      echo -e "${ANSI_BOLD}${ANSI_CYAN}[-]${ANSI_END} $*"
+      ;;
+    1)
+      echo -e "${ANSI_BOLD}${ANSI_BROWN}[*]${ANSI_END} $*"
+      ;;
+    2)
+      echo -e "${ANSI_BOLD}${ANSI_RED}[!]${ANSI_END} $*"
+      ;;
+  esac
+}
+
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 set -euo pipefail
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
@@ -9,54 +53,72 @@ serviceUp=true
 
 # Check directories
 [[ -d "$CHRONICLE_WEB_UI" ]] || {
-  echo "Error: $CHRONICLE_WEB_UI not found" >&2
+  inform 2 "$CHRONICLE_WEB_UI not found"
   exit 1
 }
 [[ -d "$CHRONICLE_BASE" ]] || {
-  echo "Error: $CHRONICLE_BASE not found" >&2
+  inform 2 "$CHRONICLE_BASE not found"
   exit 1
 }
 
 # Check commands
 command -v npm >/dev/null || {
-  echo "Error: npm not found" >&2
+  inform 2 "npm not found"
   exit 1
 }
 command -v flask >/dev/null || {
-  echo "Error: flask not found" >&2
+  inform 2 "flask not found"
   exit 1
 }
 
 # Cleanup function to kill background jobs
 cleanup() {
-  serviceUp=false
-  echo "Shutting down..."
-  pkill -P $$ || true # Kill all child processes of this script
-  wait
-  echo "All processes terminated."
+  if $serviceUp; then
+    serviceUp=false
+    inform 0 "Shutting down..."
+    pkill -P $$ || true # Kill all child processes of this script
+    wait
+    inform 0 "All processes terminated."
+  fi
 }
 
 # Trap termination signals
 trap cleanup SIGINT SIGTERM EXIT
 
 # Start processes
-echo "Starting npm dev server..."
-npm --prefix "$CHRONICLE_WEB_UI" run dev &>/dev/null &
 
-echo "Starting Flask server..."
+inform 0 "Starting npm development server..."
+npm --prefix "$CHRONICLE_WEB_UI" run dev &>/dev/null &
+npm_pid=$!
+#sleep 1
+if ! kill -0 "$npm_pid" 2>/dev/null; then
+  inform 2 "Failed to start npm dev server."
+  cleanup
+  exit 1
+fi
+
+inform 0 "Starting Flask server..."
 flask --app "${CHRONICLE_BASE}/API" run >/dev/null &
+flask_pid=$!
+sleep 1
+if ! kill -0 "$flask_pid" 2>/dev/null; then
+  inform 2 "Failed to start Flask server."
+  cleanup
+  exit 1
+fi
 
 sleep 1
 
 clear
 
-echo -e "\033[1;97m • Serving Chronicle at:\033[0m \033[4;36mhttp://localhost:3000/\033[0m\n"
+echo -e "${ANSI_BOLD} • Serving Chronicle at:${ANSI_END} ${ANSI_BOLD}${ANSI_CYAN}http://localhost:3000/${ANSI_END}\n"
 
 while $serviceUp; do
-  echo -en "  \033[1;97m>\033[0m "
+  echo -en "  ${ANSI_BOLD}>${ANSI_END} "
   read CMDLINE
 
   if [ "${CMDLINE}" == "quit" ]; then
+    echo
     cleanup
   elif [ -n "${CMDLINE}" ]; then
     ./ChronicleCLI -C ${CMDLINE}

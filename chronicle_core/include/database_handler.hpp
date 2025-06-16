@@ -9,6 +9,9 @@
 
 class ChronicleDB {
   public:
+ 
+    void connect();
+
     struct MongoProjections {
       static const bsoncxx::document::view_or_value device();
       static const bsoncxx::document::view_or_value settings();

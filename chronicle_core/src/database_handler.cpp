@@ -3,7 +3,16 @@
 
 MongoDB mdb;
 
+void ChronicleDB::connect() {
+  mdb.connect();
+  if (!mdb.connected) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Failed connecting to DB.");
+  }
+}
+
 void ChronicleDB::initDB() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Cannot initialise DB since connection to database was not established."); }
+
   bsoncxx::builder::basic::document matchAllFilter{};
 
   // Settings
@@ -45,6 +54,8 @@ void ChronicleDB::initDB() {
 }
 
 const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Cannot create mongo projection since connection to database was not established."); }
+
   return bsoncxx::builder::basic::make_document(
     bsoncxx::builder::basic::kvp("_id", 0),
     bsoncxx::builder::basic::kvp("ssh", bsoncxx::builder::basic::make_document(
@@ -65,6 +76,8 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::device() {
 }
 
 const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::settings() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Cannot create mongo projection since connection to database was not established."); }
+
   return bsoncxx::builder::basic::make_document(
     bsoncxx::builder::basic::kvp("_id", 0),
     bsoncxx::builder::basic::kvp("ssh", bsoncxx::builder::basic::make_document(
@@ -76,6 +89,8 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::settings()
 
 /* Settings */
 void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optional<int> sshTotalTimeout) {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::builder::basic::document filter{};
   bsoncxx::builder::basic::document updateDoc;
   
@@ -105,6 +120,8 @@ void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optiona
 }
 
 std::string ChronicleDB::getSettings() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
   auto results = mdb.findDocuments(mdb.settings_c, filter, ChronicleDB::MongoProjections::settings());
 
@@ -131,6 +148,8 @@ void ChronicleDB::addDevice(
   const std::string& kexMethods,
   const std::string& hostkeyAlgorithms
 ) {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::builder::basic::document deviceData;
 
   deviceData.append(
@@ -191,6 +210,7 @@ void ChronicleDB::modifyDevice(
   std::optional<std::string> kexMethods,
   std::optional<std::string> hostkeyAlgorithms
 ) {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
   
   bsoncxx::builder::basic::document updateDoc;
   
@@ -237,6 +257,8 @@ void ChronicleDB::modifyDevice(
 
 void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
 
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::builder::basic::document queryFilter;
   queryFilter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
 
@@ -261,6 +283,8 @@ void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
 }
 
 std::vector<std::string> ChronicleDB::listDevices() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
   auto results = mdb.findDocuments(mdb.devices_c, filter, ChronicleDB::MongoProjections::device());
 
@@ -274,6 +298,9 @@ std::vector<std::string> ChronicleDB::listDevices() {
 }
 
 std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
+
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::builder::basic::document filter;
 
   filter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
@@ -290,6 +317,9 @@ std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
 }
 
 bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNickname) {
+
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::builder::basic::document filter;
 
   filter.append(bsoncxx::builder::basic::kvp("device.name", deviceNickname));
@@ -304,6 +334,9 @@ bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNic
  }
 
 bsoncxx::document::value ChronicleDB::getSettingsBson() {
+
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
   auto results = mdb.findDocuments(mdb.settings_c, filter, ChronicleDB::MongoProjections::settings());
 

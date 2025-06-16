@@ -21,7 +21,7 @@ std::string getErrorMsg(int internal_exit_code) {
 
         // MongoDB
         case CHRONICLE_ERROR_MONGO_UNKNOWN: return "Unknown error while using MongoDB";
-        case CHRONICLE_ERROR_MONGO_CREATE_COLLECTION: return "Failed to create a collection while initializing database";
+        case CHRONICLE_ERROR_MONGO_CONNECT_TO_DB: return "Cannot connect to database";
         case CHRONICLE_ERROR_MONGO_INSERT_FAILED: return "Failed to insert a document into a collection";
         case CHRONICLE_ERROR_MONGO_UPDATE_FAILED: return "Failed to update a document in a collection";
         case CHRONICLE_ERROR_MONGO_DUPLICATE: return "Duplicate document";

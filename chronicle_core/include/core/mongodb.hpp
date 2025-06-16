@@ -45,6 +45,7 @@ class MongoDB {
     void insertDocument(mongocxx::collection& collection, const bsoncxx::document::view_or_value& doc);
     void updateDocument(mongocxx::collection& collection, bsoncxx::builder::basic::document& queryFilter, const bsoncxx::document::view_or_value& data);
     void deleteDocument(mongocxx::collection& collection, bsoncxx::builder::basic::document& queryFilter);
+    void connect();
     std::vector<bsoncxx::document::value> findDocuments(
       mongocxx::collection& collection,
       const bsoncxx::document::view_or_value& filter,
@@ -55,5 +56,6 @@ class MongoDB {
     mongocxx::collection devices_c;
     mongocxx::collection users_c;
     mongocxx::collection settings_c;
+    bool connected = false;
 };
 #endif // CHRONICLE_MONGODB_HPP

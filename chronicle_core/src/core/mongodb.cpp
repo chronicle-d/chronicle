@@ -14,22 +14,20 @@ void MongoDB::ensureInstance() {
 }
 
 void MongoDB::initDatabase() {
-  try { db_.create_collection("users"); } catch (...) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CREATE_COLLECTION, "(users)"); }
-  try {
-    db_.create_collection("devices");
-    auto index_keys = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("device.name", 1));
-    mongocxx::options::index index_options{};
-    index_options.unique(true);
-    db_["devices"].create_index(index_keys.view(), index_options);
-  } catch (...) {
-    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CREATE_COLLECTION, "(devices)");
-  }
-  try { db_.create_collection("settings"); } catch (...) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CREATE_COLLECTION, "(settings)"); }
+  db_.create_collection("users");
+
+  db_.create_collection("devices");
+  auto index_keys = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("device.name", 1));
+  mongocxx::options::index index_options{};
+  index_options.unique(true);
+  db_["devices"].create_index(index_keys.view(), index_options);
+
+  db_.create_collection("settings");
 }
 
-MongoDB::MongoDB() {
-  ensureInstance();
+MongoDB::MongoDB() {ensureInstance();}
 
+void MongoDB::connect() {
   client_ = mongocxx::client{mongocxx::uri{
     "mongodb://" +
     databaseUser_ + ":" + databaseUserPassword_ +
@@ -41,7 +39,12 @@ MongoDB::MongoDB() {
   devices_c = db_["devices"];
   settings_c = db_["settings"];
 
-  initDatabase();
+  try {
+    initDatabase();
+    connected = true;
+  } catch (const mongocxx::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, e.what());
+  }
 }
 
 void MongoDB::insertDocument(mongocxx::collection& collection, const bsoncxx::document::view_or_value& doc) {

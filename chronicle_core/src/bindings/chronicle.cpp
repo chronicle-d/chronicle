@@ -71,6 +71,7 @@ PYBIND11_MODULE(chronicle, m) {
     // ChronicleDB
     // - Devices
     py::class_<ChronicleDB>(m, "ChronicleDB")
+    .def("connect", &ChronicleDB::connect, "Connects to chronicle db.")
     .def(py::init<>())
     .def("addDevice", &ChronicleDB::addDevice,
         py::arg("deviceNickname"),
