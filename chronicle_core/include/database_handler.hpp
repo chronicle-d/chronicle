@@ -38,10 +38,10 @@ class ChronicleDB {
       const std::string& user,
       const std::string& password,
       const std::string& host,
-      const int& port = CHRONICLE_CONFIG_DEFUALT_PORT,
+      const int& port = CHRONICLE_CONFIG_DEFAULT_PORT,
       const int& sshVerbosity = 0,
-      const std::string& kexMethods = CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
-      const std::string& hostkeyAlgorithms = CHRONICLE_CONFIG_DEFUALT_HOSTKEYS
+      const std::string& kexMethods = CHRONICLE_CONFIG_DEFAULT_KEX_METHODS,
+      const std::string& hostkeyAlgorithms = CHRONICLE_CONFIG_DEFAULT_HOSTKEYS
     ) const;
 
     void modifyDevice(
