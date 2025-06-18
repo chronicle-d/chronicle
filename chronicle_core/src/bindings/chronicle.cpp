@@ -80,10 +80,10 @@ PYBIND11_MODULE(chronicle, m) {
         py::arg("user"),
         py::arg("password"),
         py::arg("host"),
-        py::arg("port") = CHRONICLE_CONFIG_DEFUALT_PORT,
+        py::arg("port") = CHRONICLE_CONFIG_DEFAULT_PORT,
         py::arg("sshVerbosity") = 0,
-        py::arg("kexMethods") = CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
-        py::arg("hostkeyAlgorithms") = CHRONICLE_CONFIG_DEFUALT_HOSTKEYS,
+        py::arg("kexMethods") = CHRONICLE_CONFIG_DEFAULT_KEX_METHODS,
+        py::arg("hostkeyAlgorithms") = CHRONICLE_CONFIG_DEFAULT_HOSTKEYS,
         "Add a new device to the Chronicle database.")
     .def("modifyDevice", &ChronicleDB::modifyDevice,
         py::arg("deviceNickname"),

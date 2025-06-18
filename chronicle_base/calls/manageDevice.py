@@ -3,11 +3,11 @@ from flask import Blueprint, request
 from core.response import makeResponse
 from utils.paramHandler import validateParams
 from config.settings import (
-    CHRONICLE_CONFIG_DEFUALT_HOSTKEYS,
-    CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
-    CHRONICLE_CONFIG_DEFUALT_PORT,
-    CHRONICLE_CONFIG_DEFUALT_USER,
-    CHRONICLE_CONFIG_DEFUALT_VERBOSITY,
+    CHRONICLE_CONFIG_DEFAULT_HOSTKEYS,
+    CHRONICLE_CONFIG_DEFAULT_KEX_METHODS,
+    CHRONICLE_CONFIG_DEFAULT_PORT,
+    CHRONICLE_CONFIG_DEFAULT_USER,
+    CHRONICLE_CONFIG_DEFAULT_VERBOSITY,
     API_ROUTE
 )
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
@@ -128,13 +128,13 @@ def manage_device_route():
         deviceNickname = data["name"]
         deviceName = data["device"]
         vendor = data["vendor"]
-        user = data.get("user", CHRONICLE_CONFIG_DEFUALT_USER)
+        user = data.get("user", CHRONICLE_CONFIG_DEFAULT_USER)
         password = data["password"]
         host = data["host"]
-        port = data.get("port", CHRONICLE_CONFIG_DEFUALT_PORT)
-        sshVerbosity = data.get("ssh_verbosity", CHRONICLE_CONFIG_DEFUALT_VERBOSITY)
-        kexMethods = data.get("ssh_kex_methods", CHRONICLE_CONFIG_DEFUALT_KEX_METHODS)
-        hostkeyAlgorithms = data.get("ssh_hostkey_algorithms", CHRONICLE_CONFIG_DEFUALT_HOSTKEYS)
+        port = data.get("port", CHRONICLE_CONFIG_DEFAULT_PORT)
+        sshVerbosity = data.get("ssh_verbosity", CHRONICLE_CONFIG_DEFAULT_VERBOSITY)
+        kexMethods = data.get("ssh_kex_methods", CHRONICLE_CONFIG_DEFAULT_KEX_METHODS)
+        hostkeyAlgorithms = data.get("ssh_hostkey_algorithms", CHRONICLE_CONFIG_DEFAULT_HOSTKEYS)
 
         try:
             ChronicleDB().addDevice(
