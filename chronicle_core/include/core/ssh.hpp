@@ -23,16 +23,16 @@
 
 class Ssh {
     public:
-        ssh_session startSession(connectionInfo ci);
-        void endSession(ssh_session session);
-        std::vector<std::string> executeCommand(OperationMap opartion_map, ssh_session session, ssh_channel channel);
-        ssh_channel startChannel(ssh_session session);
-        void closeChannel(ssh_channel channel);
-        void flushBanner(ssh_session session, ssh_channel channel);
+        ssh_session startSession(connectionInfo ci) const;
+        void endSession(ssh_session session) const;
+        std::vector<std::string> executeCommand(OperationMap opartion_map, ssh_session session, ssh_channel channel) const;
+        ssh_channel startChannel(ssh_session session) const;
+        void closeChannel(ssh_channel channel) const;
+        void flushBanner(ssh_session session, ssh_channel channel) const;
     private:
-        std::string verifyKnownHost(ssh_session session);
+        static std::string verifyKnownHost(ssh_session session);
         /* Should be taken from here: https://www.cisco.com/c/en/us/support/switches/catalyst-9300-series-switches/products-system-message-guides-list.html */
-        bool hasError(const std::string& line) {
+        static bool hasError(const std::string& line) {
             static const std::vector<std::regex> common_error_patterns = {
                 std::regex(R"(^%\w+-3-\w+:.*)", std::regex::icase),
                 std::regex(R"(Invalid input detected)", std::regex::icase),

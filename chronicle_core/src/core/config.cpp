@@ -3,7 +3,7 @@
 
 
 
-int connectionInfo::getVendorId(std::string vendor_name) {
+int connectionInfo::getVendorId(const std::string& vendor_name) const {
   if (vendor_name == "Cisco") {
     return CISCO_ID;
   } else if (vendor_name == "Juniper") {
@@ -13,44 +13,48 @@ int connectionInfo::getVendorId(std::string vendor_name) {
   }
 }
 
-int connectionInfo::getDeviceId(int vendor_id, std::string device_name) {
-  chronicleAssert(vendor_id > 0, 10000, "connectionInfo::getDeviceId", "No vendor ID found for " + device_name);
+int connectionInfo::getDeviceId(int vendor_id, const std::string& device_name) const {
+    chronicleAssert(vendor_id > 0, 10000, "connectionInfo::getDeviceId", "No vendor ID found for " + device_name);
 
-  switch (vendor_id) {
-    case CISCO_ID: {
-      if (device_name ==          "ENCS_5100")            return ENCS_5100;
-      else if (device_name ==     "C1700")                return C1700;
-      else if (device_name ==     "C7200")                return C7200;
-      else if (device_name ==     "CATALYST_8000V")       return CATALYST_8000V;
-      else if (device_name ==     "CSR1000V")             return CSR1000V;
-      else if (device_name ==     "LINUX_TEST")           return LINUX_TEST;
-      else return 0;
-      break;
-    }
+    using DeviceMap = std::unordered_map<std::string, int>;
 
-    case JUNIPER_ID: {
-      // Not implemented
-      if (device_name ==          "VSRX")            return VSRX;
-      return 0;
-    }
-  }
+    static const std::unordered_map<int, DeviceMap> vendorDeviceMap = {
+        { CISCO_ID, {
+            {"ENCS_5100",      ENCS_5100},
+            {"C1700",          C1700},
+            {"C7200",          C7200},
+            {"CATALYST_8000V", CATALYST_8000V},
+            {"CSR1000V",       CSR1000V},
+            {"LINUX_TEST",     LINUX_TEST}
+        }},
+        { JUNIPER_ID, {
+            {"VSRX",           VSRX}
+        }}
+    };
 
-  return 0;
+    const auto vendorIt = vendorDeviceMap.find(vendor_id);
+    if (vendorIt == vendorDeviceMap.end())
+        return 0;
+
+    const auto& deviceMap = vendorIt->second;
+    const auto deviceIt = deviceMap.find(device_name);
+
+    return (deviceIt != deviceMap.end()) ? deviceIt->second : 0;
 }
 
-connectionInfo getConnectionInfo(std::string deviceNickname) {
+connectionInfo getConnectionInfo(const std::string& deviceNickname) {
   connectionInfo ci;
 
   /* Fetch device settings */
   ChronicleDB cdb;
 
-  auto deviceSettings = cdb.getDeviceBson(deviceNickname);
-  auto ssh = deviceSettings["ssh"].get_document().view();
-  auto device = deviceSettings["device"].get_document().view();
+  const auto& deviceSettings = cdb.getDeviceBson(deviceNickname);
+  const auto& ssh = deviceSettings["ssh"].get_document().view();
+  const auto& device = deviceSettings["device"].get_document().view();
 
   /* Initialize */
   std::string vendorName = std::string(device["vendorName"].get_string().value);
-  std::string deviceName = std::string(device["deviceName"].get_string().value);;
+  std::string deviceName = std::string(device["deviceName"].get_string().value);
 
   ci.vendorName         = vendorName;
   ci.deviceName         = deviceName;
@@ -73,8 +77,8 @@ chronicleSettings getChronicleSettings() {
   /* Fetch chronicle settings */
   ChronicleDB cdb;
 
-  auto settings = cdb.getSettingsBson();
-  auto ssh = settings["ssh"].get_document().view();
+  const auto& settings = cdb.getSettingsBson();
+  const auto& ssh = settings["ssh"].get_document().view();
 
   cs.ssh_idle_timeout   = ssh["sshIdleTimeout"].get_int32();
   cs.ssh_total_timeout  = ssh["sshTotalTimeout"].get_int32();

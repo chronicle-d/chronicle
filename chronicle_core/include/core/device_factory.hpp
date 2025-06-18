@@ -5,18 +5,18 @@
 
 /* ---------- Vendor & Device IDs ---------- */
 
-// Cisco vendor ID
-#define CISCO_ID 1
-#define ENCS_5100 1
-#define C1700 2
-#define C7200 3
-#define CATALYST_8000V 4
-#define CSR1000V 5
-#define LINUX_TEST 80
+// Cisco vendor and device IDs
+inline constexpr int CISCO_ID          = 1;
+inline constexpr int ENCS_5100         = 1;
+inline constexpr int C1700             = 2;
+inline constexpr int C7200             = 3;
+inline constexpr int CATALYST_8000V    = 4;
+inline constexpr int CSR1000V          = 5;
+inline constexpr int LINUX_TEST        = 80;
 
-// Juniper vendor ID
-#define JUNIPER_ID 2
-#define VSRX 1
+// Juniper vendor and device IDs
+inline constexpr int JUNIPER_ID        = 2;
+inline constexpr int VSRX              = 1;
 
 /* ---------- Data Structures ---------- */
 
@@ -31,8 +31,8 @@ struct deviceOperations {
   std::vector<OperationMap> getConfig;
   std::vector<OperationMap> getInterfaces;
 
-  void pushCommand(std::vector<OperationMap> &list, std::string command,
-                   int skip_head, int skip_tail, std::string err_msg);
+  void pushCommand(std::vector<OperationMap> &list, const std::string& command,
+                   int skip_head, int skip_tail, const std::string& err_msg);
 };
 
 /* ---------- Required Plugin Exports ---------- */

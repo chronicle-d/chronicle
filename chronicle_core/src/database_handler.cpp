@@ -10,7 +10,7 @@ void ChronicleDB::connect() {
   }
 }
 
-void ChronicleDB::initDB() {
+void ChronicleDB::initDB() const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Cannot initialise DB since connection to database was not established."); }
 
   bsoncxx::builder::basic::document matchAllFilter{};
@@ -88,7 +88,7 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::settings()
 }
 
 /* Settings */
-void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optional<int> sshTotalTimeout) {
+void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optional<int> sshTotalTimeout) const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
   bsoncxx::builder::basic::document filter{};
@@ -119,7 +119,7 @@ void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optiona
   } 
 }
 
-std::string ChronicleDB::getSettings() {
+std::string ChronicleDB::getSettings() const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
@@ -147,7 +147,7 @@ void ChronicleDB::addDevice(
   const int& sshVerbosity,
   const std::string& kexMethods,
   const std::string& hostkeyAlgorithms
-) {
+) const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
   bsoncxx::builder::basic::document deviceData;
@@ -209,7 +209,7 @@ void ChronicleDB::modifyDevice(
   std::optional<int> sshVerbosity,
   std::optional<std::string> kexMethods,
   std::optional<std::string> hostkeyAlgorithms
-) {
+) const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
   
   bsoncxx::builder::basic::document updateDoc;
@@ -255,7 +255,7 @@ void ChronicleDB::modifyDevice(
   }
 }
 
-void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
+void ChronicleDB::deleteDevice(const std::string& deviceNickname) const {
 
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
@@ -282,7 +282,7 @@ void ChronicleDB::deleteDevice(const std::string& deviceNickname) {
   }
 }
 
-std::vector<std::string> ChronicleDB::listDevices() {
+std::vector<std::string> ChronicleDB::listDevices() const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
   bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
@@ -297,7 +297,7 @@ std::vector<std::string> ChronicleDB::listDevices() {
   return listOfDevices;
 }
 
-std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
+std::string ChronicleDB::getDevice(const std::string& deviceNickname) const {
 
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
@@ -316,7 +316,7 @@ std::string ChronicleDB::getDevice(const std::string& deviceNickname) {
   return deviceData;
 }
 
-bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNickname) {
+bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNickname) const {
 
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 
@@ -333,7 +333,7 @@ bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNic
   return bsoncxx::document::value(results[0]);
  }
 
-bsoncxx::document::value ChronicleDB::getSettingsBson() {
+bsoncxx::document::value ChronicleDB::getSettingsBson() const {
 
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
 

@@ -1,7 +1,7 @@
 #include "core/ssh.hpp"
 #include "error_handler.hpp"
 
-ssh_session Ssh::startSession(connectionInfo ci) {
+ssh_session Ssh::startSession(connectionInfo ci) const {
   ssh_session session;
 
   session = ssh_new();
@@ -36,7 +36,7 @@ ssh_session Ssh::startSession(connectionInfo ci) {
   return session;
 }
 
-ssh_channel Ssh::startChannel(ssh_session session) {
+ssh_channel Ssh::startChannel(ssh_session session) const {
   ssh_channel channel;
 
   if (!ssh_is_connected(session)) {
@@ -69,18 +69,18 @@ ssh_channel Ssh::startChannel(ssh_session session) {
   return channel;
 }
 
-void Ssh::endSession(ssh_session session) {
+void Ssh::endSession(ssh_session session) const {
   ssh_disconnect(session);
   ssh_free(session);
 }
 
-void Ssh::closeChannel(ssh_channel channel) {
+void Ssh::closeChannel(ssh_channel channel) const {
   ssh_channel_send_eof(channel);
   ssh_channel_close(channel);
   ssh_channel_free(channel);
 }
 
-std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_session session, ssh_channel channel) {
+std::vector<std::string> Ssh::executeCommand(OperationMap operation_map, ssh_session session, ssh_channel channel) const {
   int rc;
   char buffer[4096];
   int nbytes;
@@ -213,7 +213,7 @@ std::string Ssh::verifyKnownHost(ssh_session session) {
   return "";
 }
 
-void Ssh::flushBanner(ssh_session session, ssh_channel channel) {
+void Ssh::flushBanner(ssh_session session, ssh_channel channel) const {
   char buffer[256];
   int rc;
   auto start = std::chrono::steady_clock::now();

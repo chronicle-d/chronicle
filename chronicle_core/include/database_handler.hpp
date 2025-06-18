@@ -18,14 +18,14 @@ class ChronicleDB {
     };
 
     /* Global */
-    void initDB();
+    void initDB() const;
 
     /* Chronicle settings */
     void updateSettings(
       std::optional<int> sshIdleTimeout = CHRONICLE_CONFIG_DEFAULT_SSH_IDLE_TIMEOUT,
       std::optional<int> sshTotalTimeout = CHRONICLE_CONFIG_DEFAULT_SSH_TOTAL_TIMEOUT
-    );
-    std::string getSettings();
+    ) const;
+    std::string getSettings() const;
 
     /* Devices */
     void addDevice(
@@ -42,7 +42,7 @@ class ChronicleDB {
       const int& sshVerbosity = 0,
       const std::string& kexMethods = CHRONICLE_CONFIG_DEFUALT_KEX_METHODS,
       const std::string& hostkeyAlgorithms = CHRONICLE_CONFIG_DEFUALT_HOSTKEYS
-    );
+    ) const;
 
     void modifyDevice(
       const std::string& deviceNickname,
@@ -59,15 +59,15 @@ class ChronicleDB {
       std::optional<int> sshVerbosity = std::nullopt,
       std::optional<std::string> kexMethods = std::nullopt,
       std::optional<std::string> hostkeyAlgorithms = std::nullopt
-    );
+    ) const;
 
-    void deleteDevice(const std::string& deviceNickname);
-    std::vector<std::string> listDevices();
-    std::string getDevice(const std::string& deviceNickname);
+    void deleteDevice(const std::string& deviceNickname) const;
+    std::vector<std::string> listDevices() const;
+    std::string getDevice(const std::string& deviceNickname) const;
 
     // C++ Internal methods
-    bsoncxx::document::value getDeviceBson(const std::string& deviceNickname);
-    bsoncxx::document::value getSettingsBson();
+    bsoncxx::document::value getDeviceBson(const std::string& deviceNickname) const;
+    bsoncxx::document::value getSettingsBson() const;
     
 };
 #endif // CHRONICLE_DATABASE_HANDLER_HPP
