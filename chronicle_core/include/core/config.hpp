@@ -1,9 +1,7 @@
 #ifndef CHRONICLE_CONFIG_H
 #define CHRONICLE_CONFIG_H
-#include "core/error_handler.hpp"
-#include "core/device_factory.hpp"
+
 #include <string>
-#include <unordered_map>
 
 inline constexpr auto CHRONICLE_CONFIG_DEFAULT_KEX_METHODS =
     "curve25519-sha256@libssh.org,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group14-sha256";

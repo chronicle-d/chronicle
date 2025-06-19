@@ -1,17 +1,12 @@
 #ifndef CHRONICLE_SSH_H
 #define CHRONICLE_SSH_H
 #include "core/config.hpp"
-#include "core/device_factory.hpp"
-#include "core/error_handler.hpp"
-#include "libssh/libssh.h"
-#include <iostream>
 #include <vector>
-#include <sstream>
-#include <cstring>
-#include <errno.h>
-#include <chrono>
-#include <thread>
+#include <string>
 #include <regex>
+#include <libssh/libssh.h>
+#include "core/device_factory.hpp"
+
 #define SSH_FLUSH_BANNER(session, channel) \
     Sss::executeCommand("", session, channel);
 /*

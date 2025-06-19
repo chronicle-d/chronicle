@@ -2,10 +2,10 @@
 #define CHRONICLE_DATABASE_HANDLER_HPP
 
 #include "core/config.hpp"
-#include "core/mongodb.hpp"
-#include "core/error_handler.hpp"
 #include <optional>
 #include <vector>
+
+#include <bsoncxx/document/view_or_value.hpp>
 
 class ChronicleDB {
   public:

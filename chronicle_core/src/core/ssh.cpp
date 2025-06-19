@@ -1,5 +1,12 @@
 #include "core/ssh.hpp"
-#include "error_handler.hpp"
+
+#include "core/error_handler.hpp"
+
+#include <sstream>
+#include <cstring>
+#include <errno.h>
+#include <chrono>
+#include <thread>
 
 ssh_session Ssh::startSession(connectionInfo ci) const {
   ssh_session session;

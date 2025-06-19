@@ -1,4 +1,6 @@
 #include "core/error_handler.hpp"
+#include <sstream>
+#include <iostream>
 
 std::string getErrorMsg(int internal_exit_code) {
     switch (internal_exit_code) {

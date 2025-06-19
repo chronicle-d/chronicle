@@ -1,9 +1,9 @@
 #ifndef CHRONICLE_ERROR_HANDLER_HPP
 #define CHRONICLE_ERROR_HANDLER_HPP
-#include <iostream>
+
 #include <stdexcept>
 #include <string>
-#include <sstream>
+
 #define THROW_CHRONICLE_EXCEPTION(code, details) \
     throwChronicleException(code, details, __func__, __LINE__, __FILE__)
 

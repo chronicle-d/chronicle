@@ -1,4 +1,5 @@
 #include "core/chronicle.hpp"
+#include "core/ssh.hpp"
 
 std::vector<std::string> getConfig(connectionInfo ci, std::vector<OperationMap> getConfig) {
     Ssh ssh;

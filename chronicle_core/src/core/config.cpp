@@ -1,7 +1,10 @@
 #include "core/config.hpp"
 #include "database_handler.hpp"
+#include "core/error_handler.hpp"
+#include <unordered_map>
+#include "core/device_factory.hpp"
 
-
+#include <bsoncxx/builder/basic/document.hpp>
 
 int connectionInfo::getVendorId(const std::string& vendor_name) const {
   if (vendor_name == "Cisco") {

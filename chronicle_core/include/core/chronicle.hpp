@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include "core/config.hpp"
-#include "core/ssh.hpp"
 #include "core/device_factory.hpp"
 
 // Device operations

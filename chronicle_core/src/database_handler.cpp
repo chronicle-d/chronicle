@@ -1,5 +1,7 @@
 #include "database_handler.hpp"
-#include "error_handler.hpp"
+#include "core/mongodb.hpp"
+#include "core/error_handler.hpp"
+#include <bsoncxx/json.hpp>
 
 MongoDB mdb;
 

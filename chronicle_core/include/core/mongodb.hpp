@@ -10,26 +10,19 @@
  *  - devices  | All devices and their information
  *  - users    | All chroniucle users
  *  - settings | Chronicle settings
- */
-
-#include "mongocxx/collection-fwd.hpp"
-#include "mongocxx/database-fwd.hpp"
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/client.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/exception/exception.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
-#include <bsoncxx/document/view.hpp>
-
-#include <mongocxx/collection.hpp>
-#include <mongocxx/database.hpp>
-#include <mongocxx/options/find.hpp>
+*/
 
 #include <string>
-
-#include "core/error_handler.hpp"
+#include <vector>
+#include <optional>
+ 
+#include <mongocxx/collection.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/database.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/document/view_or_value.hpp>
+#include <bsoncxx/types.hpp>
+ 
 
 class MongoDB {
   private:

@@ -1,5 +1,12 @@
 #include "core/mongodb.hpp"
-
+#include <mongocxx/client.hpp>
+#include <mongocxx/database.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/exception/exception.hpp>
+#include <mongocxx/options/find.hpp>
+#include <bsoncxx/json.hpp>
+#include "core/error_handler.hpp"
 
 
 namespace {
