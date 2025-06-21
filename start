@@ -32,15 +32,15 @@ function inform {
   TYPE="$1"
   shift
   case "$TYPE" in
-    0)
-      echo -e "${ANSI_BOLD}${ANSI_CYAN}[-]${ANSI_END} $*"
-      ;;
-    1)
-      echo -e "${ANSI_BOLD}${ANSI_BROWN}[*]${ANSI_END} $*"
-      ;;
-    2)
-      echo -e "${ANSI_BOLD}${ANSI_RED}[!]${ANSI_END} $*"
-      ;;
+  0)
+    echo -e "${ANSI_BOLD}${ANSI_CYAN}[-]${ANSI_END} $*"
+    ;;
+  1)
+    echo -e "${ANSI_BOLD}${ANSI_BROWN}[*]${ANSI_END} $*"
+    ;;
+  2)
+    echo -e "${ANSI_BOLD}${ANSI_RED}[!]${ANSI_END} $*"
+    ;;
   esac
 }
 
@@ -48,7 +48,7 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 set -euo pipefail
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 CHRONICLE_WEB_UI="${SCRIPT_DIR}/chronicle_web_ui"
-CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base"
+CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base_OLD"
 serviceUp=true
 
 # Check directories

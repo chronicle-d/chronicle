@@ -1,0 +1,13 @@
+version: 1
+formatters:
+  default:
+    format: "[%(levelname)s][%(asctime)s]: %(message)s"
+    datefmt: "%H:%M:%S"
+handlers:
+  default:
+    class: logging.StreamHandler
+    formatter: default
+loggers:
+  uvicorn:
+    handlers: [default]
+    level: INFO
