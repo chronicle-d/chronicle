@@ -29,9 +29,8 @@ struct OperationMap {
 
 struct deviceOperations {
   std::vector<OperationMap> getConfig;
-  std::vector<OperationMap> getInterfaces;
 
-  void pushCommand(std::vector<OperationMap> &list, const std::string& command,
+  void pushCommand(std::vector<OperationMap>& operation, const std::string& command,
                    int skip_head, int skip_tail, const std::string& err_msg);
 };
 
