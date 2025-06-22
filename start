@@ -143,7 +143,7 @@ trap cleanup SIGINT SIGTERM EXIT
 
 # Start processes
 inform 0 "Starting gunicorn server..."
-gunicorn chronicle_base.main:app -k uvicorn.workers.UvicornWorker -w "${1:-4}" --log-config "${CHRONICLE_BASE}/gunicorn_log_config.ini" &
+gunicorn chronicle_base.main:app -k uvicorn.workers.UvicornWorker -w "${1:-4}" --log-config "${CHRONICLE_BASE}/gunicorn/gunicorn_log_config.ini" &
 gunicorn=$!
 
 if [ "${1:-4}" -gt 4 ]; then

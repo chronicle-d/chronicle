@@ -1,4 +1,4 @@
-from chronicle_base.colorful_formatter import ColorfulFormatter
+from chronicle_base.gunicorn.colorful_formatter import ColorfulFormatter
 
 log_config = {
     "version": 1,

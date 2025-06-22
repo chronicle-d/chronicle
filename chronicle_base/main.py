@@ -1,6 +1,6 @@
 import os
 import errno
-from fastapi import FastAPI, Request, HTTPException, Response
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +8,7 @@ from chronicle import ChronicleDB, ChronicleException, getErrorMsg
 from chronicle_base.routers import devices, settings
 import logging
 import logging.config
-from chronicle_base.uvicorn_log_config import log_config
+from chronicle_base.gunicorn.uvicorn_log_config import log_config
 
 logging.config.dictConfig(log_config)
 logger = logging.getLogger("uvicorn.error")
