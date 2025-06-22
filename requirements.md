@@ -22,10 +22,9 @@
 
 > Python 3
 
-| Name       | Version | How to download                       |
-| ---------- | ------- | ------------------------------------- |
-| flask      | 3.0.2-1 | `sudo apt install python3-flask`      |
-| flask-cors | 4.0.0-1 | `sudo apt install python3-flask-cors` |
+| Name    | Version   | How to download                    |
+| ------- | --------- | ---------------------------------- |
+| fastapi | 0.101.0-3 | `sudo apt install python3-fastapi` |
 
 ## Web UI
 

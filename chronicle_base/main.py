@@ -2,8 +2,8 @@ import sys
 from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
-from chronicle_base.responses import makeResponse, APIResponse
 from chronicle_base.routers import devices, settings
 
 
@@ -45,6 +45,15 @@ def create_app() -> FastAPI:
                 "data": {},
             },
         )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     return app
 
 app = create_app()

@@ -6,7 +6,7 @@ import {
   Loader2, Home, Settings, HardDrive, PlusCircle, Edit3, Trash2, Save, CheckCircle, Menu
 } from 'lucide-react';
 
-const API_BASE = 'http://127.0.0.1:5000/api';
+const API_BASE = 'http://127.0.0.1:8000';
 
 export default function ChronicleDashboard() {
   const [tab, setTab] = useState('home');
@@ -25,9 +25,9 @@ export default function ChronicleDashboard() {
 
   const fetchDevices = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/listDevices`);
+      const res = await axios.get(`${API_BASE}/devices/`);
       if (res.data.success) {
-        setDevices(res.data.data.devices);
+        setDevices(res.data.data.devices || []);
         setFeatured(res.data.data.devices.slice(0, 2));
       }
     } catch (e) {
@@ -37,12 +37,14 @@ export default function ChronicleDashboard() {
 
   const fetchSettings = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/getSettings`);
-      if (res.data.success) setSettings(res.data.data.settings);
+      const res = await axios.get(`${API_BASE}/settings/`);
+      if (res.data.success) {
+        setSettings(res.data.data);
+      }
     } catch (e) {
       toastError(e);
     }
-  };
+  };  
 
   const toastSuccess = (msg) => {
     setToast({ type: 'success', msg });
@@ -57,7 +59,7 @@ export default function ChronicleDashboard() {
 
   const saveSettings = async () => {
     try {
-      await axios.post(`${API_BASE}/updateSettings`, null, { params: settingsChanged });
+      await axios.post(`${API_BASE}/settings/`, null, { params: settingsChanged });
       toastSuccess('Settings updated');
       setSettingsChanged({});
       fetchSettings();
@@ -68,7 +70,7 @@ export default function ChronicleDashboard() {
 
   const deleteDevice = async (name) => {
     try {
-      await axios.post(`${API_BASE}/deleteDevice?name=${name}`);
+      await axios.delete(`${API_BASE}/devices/${name}`);
       toastSuccess('Device deleted');
       fetchDevices();
     } catch (e) {
@@ -80,15 +82,49 @@ export default function ChronicleDashboard() {
     const { type, data } = modal;
     try {
       if (type === 'modify') {
-        const res = await axios.get(`${API_BASE}/getDevice`, { params: { name: data.name } });
+        const res = await axios.get(`${API_BASE}/devices/${data.name}`);
         if (res.data.success) {
           const fullData = { ...res.data.data.device, ...res.data.data.ssh };
           const updatedData = { ...fullData, ...data };
-          await axios.post(`${API_BASE}/manageDevice?action=modify`, null, { params: updatedData });
+          if (updatedData.port) updatedData.port = Number(updatedData.port);
+          if (updatedData.sshVerbosity) updatedData.sshVerbosity = Number(updatedData.sshVerbosity);
+          await axios.post(`${API_BASE}/devices/modify/${data.name}`, null, {
+            params: updatedData,
+          });
           toastSuccess('Device updated');
         }
       } else {
-        await axios.post(`${API_BASE}/manageDevice?action=create`, null, { params: data });
+        const {
+          name: deviceNickname,
+          deviceName,
+          vendor,
+          password,
+          host,
+          port,
+          sshVerbosity,
+          kexMethods,
+          hostkeyAlgorithms,
+          user
+        } = data;
+
+        if (!deviceNickname || !deviceName || !vendor || !password || !host) {
+          toastError({ response: { data: { message: 'Missing required fields' } } });
+          return;
+        }
+
+        const params = {
+          deviceName,
+          vendor,
+          password,
+          host,
+          ...(port && { port: Number(port) }),
+          ...(sshVerbosity && { sshVerbosity: Number(sshVerbosity) }),
+          ...(kexMethods && { kexMethods }),
+          ...(hostkeyAlgorithms && { hostkeyAlgorithms }),
+          ...(user && { user })
+        };
+
+        await axios.post(`${API_BASE}/devices/create/${deviceNickname}`, null, { params });
         toastSuccess('Device added');
       }
       fetchDevices();
@@ -143,7 +179,7 @@ export default function ChronicleDashboard() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Devices</h2>
-              <button onClick={() => setModal({ type: 'create', data: { name: '', device: '', vendor: '', user: '', password: '', host: '', port: '' } })} className="bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center">
+              <button onClick={() => setModal({ type: 'create', data: { name: '', deviceName: '', vendor: '', user: '', password: '', host: '', port: '', sshVerbosity: '', kexMethods: '', hostkeyAlgorithms: '' } })} className="bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center">
                 <PlusCircle className="mr-2" size={16} /> Add Device
               </button>
             </div>
@@ -165,12 +201,17 @@ export default function ChronicleDashboard() {
                     <td className="p-3">{d.device.vendorName}</td>
                     <td className="p-3">{d.device.deviceName}</td>
                     <td className="p-3 space-x-2">
-                      <button onClick={() => fetch(`${API_BASE}/getDevice?name=${d.device.name}`).then(res => res.json()).then(res => {
-                        if (res.success) {
-                          const fullData = { ...res.data.device, ...res.data.ssh };
-                          setModal({ type: 'modify', data: fullData });
+                      <button onClick={async () => {
+                        try {
+                          const res = await axios.get(`${API_BASE}/devices/${d.device.name}`);
+                          if (res.data.success) {
+                            const fullData = { ...res.data.data.device, ...res.data.data.ssh };
+                            setModal({ type: 'modify', data: fullData });
+                          }
+                        } catch (e) {
+                          toastError(e);
                         }
-                      })} className="text-blue-600"><Edit3 size={16} /></button>
+                      }} className="text-blue-600"><Edit3 size={16} /></button>
                       <button onClick={() => deleteDevice(d.device.name)} className="text-red-600"><Trash2 size={16} /></button>
                     </td>
                   </tr>
@@ -187,11 +228,23 @@ export default function ChronicleDashboard() {
               {Object.entries(settings.ssh).map(([k, v]) => (
                 <div key={k} className="flex flex-col">
                   <label htmlFor={`setting-${k}`} className="text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
-                  <input id={`setting-${k}`} name={k} title={k} defaultValue={v} placeholder={k} onChange={(e) => setSettingsChanged({ ...settingsChanged, [k]: e.target.value })} className="border px-3 py-2 rounded" />
+                  <input
+                    id={`setting-${k}`}
+                    name={k}
+                    title={k}
+                    defaultValue={String(v ?? '')}
+                    placeholder={k}
+                    onChange={(e) => setSettingsChanged({ ...settingsChanged, [k]: e.target.value })}
+                    className="border px-3 py-2 rounded"
+                  />
                 </div>
               ))}
             </div>
-            <button disabled={Object.keys(settingsChanged).length === 0} onClick={saveSettings} className={`mt-4 px-4 py-2 rounded ${Object.keys(settingsChanged).length ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+            <button
+              disabled={Object.keys(settingsChanged).length === 0}
+              onClick={saveSettings}
+              className={`mt-4 px-4 py-2 rounded ${Object.keys(settingsChanged).length ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+            >
               <Save className="inline mr-2" size={16} /> Save Changes
             </button>
           </div>
@@ -205,7 +258,7 @@ export default function ChronicleDashboard() {
                 {Object.entries(modal.data).map(([k, v]) => (
                   <div key={k} className="flex flex-col">
                     <label htmlFor={`field-${k}`} className="text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
-                    <input id={`field-${k}`} name={k} title={k} placeholder={k} value={v || ''} onChange={(e) => setModal({ ...modal, data: { ...modal.data, [k]: e.target.value } })} className="border px-3 py-1 rounded" />
+                    <input id={`field-${k}`} name={k} title={k} placeholder={k} value={v || ''} type={(k === 'port' || k === 'sshVerbosity') ? 'number' : 'text'} onChange={(e) => setModal({ ...modal, data: { ...modal.data, [k]: e.target.value } })} className="border px-3 py-1 rounded" />
                   </div>
                 ))}
               </div>
