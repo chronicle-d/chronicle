@@ -22,12 +22,20 @@ void MongoDB::ensureInstance() {
 
 void MongoDB::initDatabase() {
   db_.create_collection("users");
+  {
+    auto index_keys = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("username", 1));
+    mongocxx::options::index index_options{};
+    index_options.unique(true);
+    db_["users"].create_index(index_keys.view(), index_options);
+  }
 
   db_.create_collection("devices");
-  auto index_keys = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("device.name", 1));
-  mongocxx::options::index index_options{};
-  index_options.unique(true);
-  db_["devices"].create_index(index_keys.view(), index_options);
+  {
+    auto index_keys = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("device.name", 1));
+    mongocxx::options::index index_options{};
+    index_options.unique(true);
+    db_["devices"].create_index(index_keys.view(), index_options);
+  }
 
   db_.create_collection("settings");
 }

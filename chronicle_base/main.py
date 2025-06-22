@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
-from chronicle_base.routers import devices, settings
+from chronicle_base.routers import devices, settings, users
 import logging
 import logging.config
 from chronicle_base.gunicorn.uvicorn_log_config import log_config
@@ -78,3 +78,4 @@ app = create_app()
 
 app.include_router(devices.router)
 app.include_router(settings.router)
+app.include_router(users.router)

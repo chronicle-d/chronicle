@@ -113,10 +113,10 @@ PYBIND11_MODULE(chronicle, m) {
 
       // Users
       .def("addUser", &ChronicleDB::addUser, py::arg("username"),
-           py::arg("password"), py::arg("connect"),
+           py::arg("password"), py::arg("connected"),
            "Adds a new user to the Chronicle database.")
       .def("modifyUser", &ChronicleDB::modifyUser, py::arg("username"),
-           py::arg("password"), py::arg("connect"),
+           py::arg("password"), py::arg("connected"),
            "Modify a new user to the Chronicle database.")
       .def("deleteUser", &ChronicleDB::deleteUser, py::arg("username"),
            "Delete a user from the Chronicle database.")
