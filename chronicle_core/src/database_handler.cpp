@@ -89,6 +89,18 @@ const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::settings()
   );
 }
 
+const bsoncxx::document::view_or_value ChronicleDB::MongoProjections::users() {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Cannot create mongo projection since connection to database was not established."); }
+
+  return bsoncxx::builder::basic::make_document(
+    bsoncxx::builder::basic::kvp("_id", 0),
+    bsoncxx::builder::basic::kvp("username", 1),
+    bsoncxx::builder::basic::kvp("password", 1),
+    bsoncxx::builder::basic::kvp("connected", 1)
+  );
+}
+
+
 /* Settings */
 void ChronicleDB::updateSettings(std::optional<int> sshIdleTimeout, std::optional<int> sshTotalTimeout) const {
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
@@ -318,6 +330,141 @@ std::string ChronicleDB::getDevice(const std::string& deviceNickname) const {
   return deviceData;
 }
 
+/* Users */
+void ChronicleDB::addUser(const std::string& username, const std::string& password, bool connected) const {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
+  bsoncxx::builder::basic::document userData;
+
+  userData.append(
+    bsoncxx::builder::basic::kvp("username", username),
+    bsoncxx::builder::basic::kvp("password", password),
+    bsoncxx::builder::basic::kvp("connected", connected)
+  );
+
+  try {
+    mdb.insertDocument(mdb.users_c, userData.view());
+  } catch (const ChronicleException& e) {
+
+    std::string fullMessage;
+
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DUPLICATE) {
+      fullMessage = "User named '" + username + "' exists already.";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED, fullMessage);
+    }
+
+    fullMessage =
+      "Chronicle exception:\n"
+      "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+      "Details: " + e.getDetails();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED, fullMessage);
+  } catch (const std::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_ADD_FAILED, e.what());
+  }
+}
+
+void ChronicleDB::modifyUser(
+  const std::string& username,
+  std::optional<std::string> password,
+  std::optional<bool> connected
+) const {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
+  bsoncxx::builder::basic::document updateDoc;
+
+  if (password)             updateDoc.append(bsoncxx::builder::basic::kvp("password", *password));
+  if (connected)            updateDoc.append(bsoncxx::builder::basic::kvp("connected", *connected));
+
+  if (updateDoc.view().empty()) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, "No fields provided to modify.");
+  }
+
+  bsoncxx::builder::basic::document queryFilter;
+  queryFilter.append(bsoncxx::builder::basic::kvp("username", username));
+
+  try {
+    mdb.updateDocument(mdb.users_c, queryFilter, updateDoc.view());
+  } catch (const ChronicleException& e) {
+
+    std::string fullMessage;
+
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
+      fullMessage = "User " + username + " not found";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+    }
+
+    fullMessage =
+      "Chronicle exception:\n"
+      "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+      "Details: " + e.getDetails();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, fullMessage);
+  } catch (const std::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_MODIFY_FAILED, e.what());
+  }
+}
+
+void ChronicleDB::deleteUser(const std::string& username) const {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
+  bsoncxx::builder::basic::document queryFilter;
+  queryFilter.append(bsoncxx::builder::basic::kvp("username", username));
+
+  try {
+    mdb.deleteDocument(mdb.users_c, queryFilter);
+  } catch (const ChronicleException& e) {
+    std::string fullMessage;
+
+    if (e.getCode() == CHRONICLE_ERROR_MONGO_DOCUMENT_NOT_FOUND) {
+      fullMessage = "User " + username + " not found";
+      THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, fullMessage);
+    }
+
+    fullMessage =
+      "Chronicle exception:\n"
+      "ChronicleCode: " + std::to_string(e.getCode()) + "\n"
+      "Details: " + e.getDetails();
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, fullMessage);
+  } catch (const std::exception& e) {
+    THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_CHRONICLE_DB_DELETE_FAILED, e.what());
+  }
+}
+
+std::vector<std::string> ChronicleDB::listUsers() const {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
+  bsoncxx::document::view_or_value filter = bsoncxx::builder::basic::make_document(); // List all
+  auto results = mdb.findDocuments(mdb.users_c, filter, ChronicleDB::MongoProjections::users());
+
+  std::vector<std::string> listOfUsers;
+
+  for (const auto r : results) {
+    listOfUsers.push_back( bsoncxx::to_json(r));
+  }
+
+  return listOfUsers;
+}
+
+std::string ChronicleDB::getUser(const std::string& username) const {
+  if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
+
+  bsoncxx::builder::basic::document filter;
+
+  filter.append(bsoncxx::builder::basic::kvp("username", username));
+
+  auto results = mdb.findDocuments(mdb.users_c, filter.view(), ChronicleDB::MongoProjections::users());
+
+  std::string userData;
+
+  if (!results.empty()) {
+      userData = bsoncxx::to_json(results[0].view());
+  }
+
+  return userData;
+}
+
+
+
+// Internal C++ methods
 bsoncxx::document::value ChronicleDB::getDeviceBson(const std::string& deviceNickname) const {
 
   if (!mdb.connected) { THROW_CHRONICLE_EXCEPTION(CHRONICLE_ERROR_MONGO_CONNECT_TO_DB, "Connection to database was not established."); }
