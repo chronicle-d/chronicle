@@ -120,6 +120,11 @@ command -v uvicorn >/dev/null || {
   exit 1
 }
 
+command -v gunicorn >/dev/null || {
+  inform 2 "gunicorn not found"
+  exit 1
+}
+
 # Cleanup function to kill background jobs
 cleanup() {
   if $serviceUp; then
@@ -137,22 +142,28 @@ cleanup() {
 trap cleanup SIGINT SIGTERM EXIT
 
 # Start processes
+inform 0 "Starting gunicorn server..."
+gunicorn chronicle_base.main:app -k uvicorn.workers.UvicornWorker -w "${1:-4}" --log-config "${CHRONICLE_BASE}/gunicorn_log_config.ini" &
+gunicorn=$!
+
+if [ "${1:-4}" -gt 4 ]; then
+  sleep 2
+else
+  sleep 1
+fi
+
+if ! kill -0 "$gunicorn" 2>/dev/null; then
+  inform 2 "Failed to start gunicorn server."
+  cleanup
+  exit 1
+fi
+
 inform 0 "Starting npm development server..."
 npm --prefix "$CHRONICLE_WEB_UI" run dev >/dev/null &
 npm_pid=$!
 sleep 0.1
 if ! kill -0 "$npm_pid" 2>/dev/null; then
   inform 2 "Failed to start npm dev server."
-  cleanup
-  exit 1
-fi
-
-inform 0 "Starting uvicorn server..."
-uvicorn chronicle_base.main:app --workers "${1:-4}" --log-config "${CHRONICLE_BASE}/uvicorn_log_config.yaml" &
-uvicorn_pid=$!
-sleep 1
-if ! kill -0 "$uvicorn_pid" 2>/dev/null; then
-  inform 2 "Failed to start uvicorn server."
   cleanup
   exit 1
 fi

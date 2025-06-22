@@ -1,31 +1,26 @@
-import sys
+import os
+import errno
 from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from chronicle import ChronicleDB, ChronicleException, getErrorMsg
 from chronicle_base.routers import devices, settings
+import logging
+import logging.config
+from chronicle_base.uvicorn_log_config import log_config
+
+logging.config.dictConfig(log_config)
+logger = logging.getLogger("uvicorn.error")
 
 
 def create_app() -> FastAPI:
-    try:
-        ChronicleDB().connect()
-        ChronicleDB().initDB()
-    except (ChronicleException, Exception) as e:
-        if isinstance(e, ChronicleException):
-            errorMsg = getErrorMsg(e.code)
-            if (e.code == 10001):
-                sys.stderr.write(f"Error {e.code}, {errorMsg} => Make sure that MongoD is up. ({e.details})\n")
-            else:
-                sys.stderr.write(f"Error {e.code}, {errorMsg} => {e.details}\n")
-        else:
-            sys.stderr.write(f"Pythonic error: {e}\n")
-        sys.exit(1)
-
     app = FastAPI()
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ):
         return JSONResponse(
             status_code=422,
             content={
@@ -54,7 +49,30 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    @app.on_event("startup")
+    async def startup_event():
+        try:
+            ChronicleDB().connect()
+            ChronicleDB().initDB()
+        except (ChronicleException, Exception) as e:
+            if isinstance(e, ChronicleException):
+                errorMsg = getErrorMsg(e.code)
+                if e.code == 10001:
+                    logger.error(
+                        f"Error {e.code}, {errorMsg} - Make sure that MongoDB is up."
+                    )
+                    logger.error(f"{e.details}")
+                else:
+                    logger.error(f"Error {e.code}, {errorMsg} => {e.details}")
+            else:
+                logger.error(f"ChronicleDB init failed: {e}")
+
+            logger.error("ChronicleDB unavailable, shutting down.")
+
+            os._exit(errno.EINTR)
+
     return app
+
 
 app = create_app()
 
