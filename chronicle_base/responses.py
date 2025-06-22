@@ -4,6 +4,7 @@ from functools import wraps
 from pydantic import BaseModel
 from chronicle import ChronicleException, getErrorMsg
 from inspect import iscoroutinefunction
+from chronicle_base.config import get_error_context, set_error_context, reset_error_context
 
 class APIResponse(BaseModel):
     success: int
@@ -48,7 +49,7 @@ def makeResponseDoc(*docs: tuple[int, str]) -> dict:
         for status, desc in docs_with_defaults
     }
 
-def responseExceptionHandler(action_description: str):
+def responseExceptionHandler():
     def decorator(func):
         if iscoroutinefunction(func):
             @wraps(func)
@@ -58,13 +59,12 @@ def responseExceptionHandler(action_description: str):
                 except HTTPException:
                     raise
                 except ChronicleException as ce:
-                    msg = f"{action_description}: {getErrorMsg(ce.code)}, {ce.details}"
-                    raise HTTPException(status_code=500, detail=msg)
+                    context = get_error_context()
+                    raise HTTPException(status_code=500, detail=f"{context}: {getErrorMsg(ce.code)}, {ce.details}")
                 except Exception as e:
-                    msg = f"{action_description}: {str(e)}"
-                    raise HTTPException(status_code=500, detail=msg)
+                    context = get_error_context()
+                    raise HTTPException(status_code=500, detail=f"{context} (Python error): {str(e)}")
             return async_wrapper
-
         else:
             @wraps(func)
             def sync_wrapper(*args, **kwargs):
@@ -73,10 +73,10 @@ def responseExceptionHandler(action_description: str):
                 except HTTPException:
                     raise
                 except ChronicleException as ce:
-                    msg = f"{action_description}: {getErrorMsg(ce.code)}, {ce.details}"
-                    raise HTTPException(status_code=500, detail=msg)
+                    context = get_error_context()
+                    raise HTTPException(status_code=500, detail=f"{context}: {getErrorMsg(ce.code)}, {ce.details}")
                 except Exception as e:
-                    msg = f"{action_description}: {str(e)}"
-                    raise HTTPException(status_code=500, detail=msg)
+                    context = get_error_context()
+                    raise HTTPException(status_code=500, detail=f"{context}: {str(e)}")
             return sync_wrapper
     return decorator

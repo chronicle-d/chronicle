@@ -85,12 +85,45 @@ export default function ChronicleDashboard() {
         const res = await axios.get(`${API_BASE}/devices/${data.name}`);
         if (res.data.success) {
           const fullData = { ...res.data.data.device, ...res.data.data.ssh };
-          const updatedData = { ...fullData, ...data };
-          if (updatedData.port) updatedData.port = Number(updatedData.port);
-          if (updatedData.sshVerbosity) updatedData.sshVerbosity = Number(updatedData.sshVerbosity);
-          await axios.post(`${API_BASE}/devices/modify/${data.name}`, null, {
-            params: updatedData,
+          const changedFields: Record<string, any> = {};
+      
+          // שדות שדורשים שינוי שם לפני שליחה
+          const fieldNameMap: Record<string, string> = {
+            vendorName: 'vendor',
+            verbosity: 'sshVerbosity',
+          };
+      
+          for (const [key, value] of Object.entries(data)) {
+            const original = fullData[key];
+      
+            const v = value === null || value === undefined ? '' : String(value).trim();
+            const o = original === null || original === undefined ? '' : String(original).trim();
+      
+            if (v !== o) {
+              const targetKey = fieldNameMap[key] || key;
+              changedFields[targetKey] = value;
+            }
+          }
+      
+          delete changedFields.name;
+      
+          ['port', 'sshVerbosity'].forEach((key) => {
+            if (changedFields[key]) {
+              changedFields[key] = Number(changedFields[key]);
+            }
           });
+      
+          if (Object.keys(changedFields).length === 0) {
+            toastSuccess('No changes detected');
+            return;
+          }
+      
+          console.log("Sending changedFields:", changedFields);
+      
+          await axios.post(`${API_BASE}/devices/modify/${data.name}`, null, {
+            params: changedFields,
+          });
+      
           toastSuccess('Device updated');
         }
       } else {
@@ -106,12 +139,12 @@ export default function ChronicleDashboard() {
           hostkeyAlgorithms,
           user
         } = data;
-
+  
         if (!deviceNickname || !deviceName || !vendor || !password || !host) {
           toastError({ response: { data: { message: 'Missing required fields' } } });
           return;
         }
-
+  
         const params = {
           deviceName,
           vendor,
@@ -123,16 +156,19 @@ export default function ChronicleDashboard() {
           ...(hostkeyAlgorithms && { hostkeyAlgorithms }),
           ...(user && { user })
         };
-
+  
+        console.log("Creating device with:", params);
+  
         await axios.post(`${API_BASE}/devices/create/${deviceNickname}`, null, { params });
         toastSuccess('Device added');
       }
+  
       fetchDevices();
       setModal(null);
     } catch (e) {
       toastError(e);
     }
-  };
+  };  
 
   return (
     <div className="flex min-h-screen bg-white text-gray-800">

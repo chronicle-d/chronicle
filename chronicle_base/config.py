@@ -1,3 +1,6 @@
+from contextvars import ContextVar
+from fastapi import Depends, Request
+
 # Paths
 DEVICES_BASE = "/home/noam/Work_spaces/Personal/chronicle/chronicle_core/bin/devices/"
 
@@ -12,3 +15,21 @@ CHRONICLE_CONFIG_DEFAULT_VERBOSITY = 0
 ## Chronicle settings
 CHRONICLE_CONFIG_DEFAULT_SSH_IDLE_TIMEOUT = 1000
 CHRONICLE_CONFIG_DEFAULT_SSH_TOTAL_TIMEOUT = 10000
+
+# Const vars
+__error_context: ContextVar[str] = ContextVar("__error_context", default="Unknown error")
+def get_error_context() -> str:
+    return __error_context.get()
+def set_error_context(msg: str):
+    return __error_context.set(msg)
+def reset_error_context(token):
+    __error_context.reset(token)
+def set_error_context_dep(msg_template: str):
+    async def _set(request: Request):
+        params = {**request.path_params, **dict(request.query_params)}
+        try:
+            msg = msg_template.format(**params)
+        except KeyError:
+            msg = msg_template
+        set_error_context(msg)
+    return _set

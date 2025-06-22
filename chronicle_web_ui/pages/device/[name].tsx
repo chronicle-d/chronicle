@@ -3,17 +3,11 @@ import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
-  Save,
-  Loader2,
-  Pencil,
-  Download,
-  X,
-  Menu,
-  Home,
-  HardDrive,
-  Settings
+  Save, Loader2, Pencil, Download, X, Menu, Home, HardDrive, Settings
 } from 'lucide-react';
 import Link from 'next/link';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 const API_BASE = 'http://127.0.0.1:8000';
 
@@ -51,7 +45,8 @@ export default function DevicePage() {
       setLoading(true);
       const res = await axios.get(`${API_BASE}/devices/${name}/config`);
       if (res.data.success) {
-        setConfig(res.data.data.config);
+        // פשוט שמור את המערך
+        setConfig(res.data.data);
         setToast({ type: 'success', msg: 'Configuration fetched successfully' });
       } else {
         const msg = res.data.description || 'Error fetching config';
@@ -63,11 +58,39 @@ export default function DevicePage() {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const saveChanges = async () => {
     try {
-      await axios.post(`${API_BASE}/devices/modify/${name}`, null, { params: form });
+      const changedFields = {};
+      const fieldNameMap = { vendorName: 'vendor', verbosity: 'sshVerbosity' };
+
+      for (const [key, value] of Object.entries(form)) {
+        const original = device[key];
+        const val = value === undefined || value === null ? '' : String(value).trim();
+        const orig = original === undefined || original === null ? '' : String(original).trim();
+
+        if (val !== orig) {
+          const mappedKey = fieldNameMap[key] || key;
+          changedFields[mappedKey] = value;
+        }
+      }
+
+      delete changedFields.name;
+
+      ['port', 'sshVerbosity'].forEach((key) => {
+        if (changedFields[key]) {
+          changedFields[key] = Number(changedFields[key]);
+        }
+      });
+
+      if (Object.keys(changedFields).length === 0) {
+        setToast({ type: 'success', msg: 'No changes detected' });
+        setEditing(false);
+        return;
+      }
+
+      await axios.post(`${API_BASE}/devices/modify/${name}`, null, { params: changedFields });
       setToast({ type: 'success', msg: 'Device updated successfully' });
       setEditing(false);
       fetchDevice();
@@ -80,9 +103,7 @@ export default function DevicePage() {
 
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
-      <Head>
-        <title>Device: {name}</title>
-      </Head>
+      <Head><title>Device: {name}</title></Head>
 
       <button onClick={() => setSidebarOpen(!sidebarOpen)} className="fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-md shadow-md">
         <Menu size={20} />
@@ -92,9 +113,9 @@ export default function DevicePage() {
         <aside className="w-64 fixed top-0 left-0 h-full bg-gray-900 text-white p-4 shadow-lg z-40">
           <h1 className="text-2xl font-bold mb-6">Chronicle</h1>
           <nav className="space-y-2">
-            <Link href="/" className="w-full block text-left px-4 py-2 rounded hover:bg-gray-800"><Home size={16} className="inline mr-2" /> Home</Link>
-            <Link href="/" className="w-full block text-left px-4 py-2 rounded hover:bg-gray-800"><HardDrive size={16} className="inline mr-2" /> Devices</Link>
-            <Link href="/" className="w-full block text-left px-4 py-2 rounded hover:bg-gray-800"><Settings size={16} className="inline mr-2" /> Settings</Link>
+            <Link href="/" className="w-full block px-4 py-2 rounded hover:bg-gray-800"><Home size={16} className="inline mr-2" /> Home</Link>
+            <Link href="/" className="w-full block px-4 py-2 rounded hover:bg-gray-800"><HardDrive size={16} className="inline mr-2" /> Devices</Link>
+            <Link href="/" className="w-full block px-4 py-2 rounded hover:bg-gray-800"><Settings size={16} className="inline mr-2" /> Settings</Link>
           </nav>
         </aside>
       )}
@@ -127,8 +148,6 @@ export default function DevicePage() {
                       <input
                         id={`field-${k}`}
                         name={k}
-                        title={k}
-                        placeholder={k}
                         value={v || ''}
                         onChange={(e) => setForm({ ...form, [k]: e.target.value })}
                         className="border px-3 py-2 rounded"
@@ -164,10 +183,25 @@ export default function DevicePage() {
           )}
 
           {config && (
-            <div className="mt-6 bg-gray-100 rounded p-4 overflow-auto max-h-[500px] border">
-              <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800">
-                {Array.isArray(config) ? config.join('\n') : config}
-              </pre>
+            <div className="mt-6 bg-white rounded p-4 overflow-auto max-h-[600px] border shadow">
+              <h2 className="text-lg font-semibold mb-2">Device Configuration Preview</h2>
+              <SyntaxHighlighter
+                language={
+                  device?.vendorName?.toLowerCase().includes('juniper') ? 'clike' :
+                  device?.vendorName?.toLowerCase().includes('cisco') ? 'plaintext' :
+                  'bash'
+                }
+                style={dracula}
+                wrapLongLines
+                customStyle={{
+                  borderRadius: '0.5rem',
+                  padding: '1rem',
+                  fontSize: '0.85rem',
+                  background: '#1e1e1e',
+                }}
+              >
+                {Array.isArray(config) ? config.join('\n') : String(config)}
+              </SyntaxHighlighter>
             </div>
           )}
         </div>

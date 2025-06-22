@@ -2,22 +2,24 @@
 This file contains all Chronicle API endpoints to handle devices.
 """
 
-from fastapi import APIRouter, Response
-from chronicle import ChronicleDB, getConnectionInfo, loadDeviceOps, getConfig
+from fastapi import APIRouter, Response, Depends
+from chronicle import ChronicleDB, deviceOperations, connectionInfo, getConfig
 from chronicle_base.responses import makeResponse, APIResponse, makeResponseDoc, responseExceptionHandler
+from chronicle_base.dependencies import getDeviceOperationalMap, getCdb, getDeviceConnectionInfo, safeDep
 from chronicle_base.config import (
-    DEVICES_BASE,
     CHRONICLE_CONFIG_DEFAULT_HOSTKEYS,
     CHRONICLE_CONFIG_DEFAULT_KEX_METHODS,
     CHRONICLE_CONFIG_DEFAULT_PORT,
     CHRONICLE_CONFIG_DEFAULT_USER,
-    CHRONICLE_CONFIG_DEFAULT_VERBOSITY
+    CHRONICLE_CONFIG_DEFAULT_VERBOSITY,
+    set_error_context_dep
 )
+from chronicle_base.log import captureStderrToLogger
+from chronicle_base.utils import stripAnsi
 import json
-import os
 
 router = APIRouter(prefix="/devices", tags=["devices"],)
-cdb = ChronicleDB()
+E = set_error_context_dep
 
 # Delete a device
 @router.delete(
@@ -25,8 +27,14 @@ cdb = ChronicleDB()
     response_model=APIResponse,
     responses=makeResponseDoc((200, "Device was deleted successfully."))
 )
-@responseExceptionHandler("Device could not be deleted")
-def delete_device(response: Response, deviceNickname: str):
+@responseExceptionHandler()
+def delete_device(
+    response: Response,
+    deviceNickname: str,
+    _: None = Depends(E("Device '{deviceNickname}' could not be deleted")),
+    cdb: ChronicleDB = Depends(safeDep(getCdb))
+):
+
     cdb.deleteDevice(deviceNickname=deviceNickname)
     
     return makeResponse(response, True, f"Deleted device '{deviceNickname}' successfully.", {}, 200)
@@ -40,9 +48,11 @@ def delete_device(response: Response, deviceNickname: str):
         (404, "Device was not found.")
     )
 )
-@responseExceptionHandler("Device could not be fetched")
-def get_device(response: Response, deviceNickname: str):
+@responseExceptionHandler()
+def get_device(response: Response, deviceNickname: str, _: None = Depends(E("Device '{deviceNickname}' could not be fetched")), cdb: ChronicleDB =  Depends(safeDep(getCdb))):
+
     deviceData = cdb.getDevice(deviceNickname=deviceNickname)
+
     if not deviceData:
         return makeResponse(response, False, f"Device '{deviceNickname}' does not exist.", {}, 404)
     
@@ -56,12 +66,18 @@ def get_device(response: Response, deviceNickname: str):
         (200, "Device configuration was fetched successfully."),
     )
 )
-@responseExceptionHandler("Device configuration could not be fetched")
-async def get_device_config(response: Response, deviceNickname: str):
-    deviceSettings = getConnectionInfo(deviceNickname)
-    deviceMapPath = os.path.join(DEVICES_BASE, deviceSettings.vendorName, deviceSettings.deviceName + ".cld")
-    DeviceOperationalMap = loadDeviceOps(deviceMapPath, deviceSettings.device, deviceSettings.vendor)
-    deviceConfig = await getConfig(deviceSettings, DeviceOperationalMap.ops.getConfig)
+@responseExceptionHandler()
+async def get_device_config(
+    response: Response,
+    deviceNickname: str,
+    _: None = Depends(E("Device '{deviceNickname}' configuration could not be fetched")),
+    deviceSettings: connectionInfo = Depends(safeDep(getDeviceConnectionInfo)),
+    dom: deviceOperations = Depends(safeDep(getDeviceOperationalMap))
+):
+
+    with captureStderrToLogger("SSH - Get device config"):
+        rawConfig = getConfig(deviceSettings, dom.ops.getConfig)
+        deviceConfig = [stripAnsi(line) for line in rawConfig]
     
     return makeResponse(response, True, f"Fetched device '{deviceNickname}' configuration successfully.", deviceConfig, 200)
 
@@ -73,8 +89,8 @@ async def get_device_config(response: Response, deviceNickname: str):
         (200, "Fetched list of devices successfully"),
     )
 )
-@responseExceptionHandler("Could not fetch list of devices")
-def list_devices(response: Response):
+@responseExceptionHandler()
+def list_devices(response: Response, _: None = Depends(E("Could not fetch list of devices")), cdb: ChronicleDB =  Depends(safeDep(getCdb))):
     devices = cdb.listDevices()
     formatted_devices = [json.loads(d) for d in devices]
     
@@ -96,7 +112,7 @@ def list_devices(response: Response):
         (200, "Device created successfully."),
     )
 )
-@responseExceptionHandler("Device could not be created")
+@responseExceptionHandler()
 def create_device(
     response: Response,
     deviceNickname: str,
@@ -108,8 +124,11 @@ def create_device(
     sshVerbosity: int = CHRONICLE_CONFIG_DEFAULT_VERBOSITY,
     kexMethods: str = CHRONICLE_CONFIG_DEFAULT_KEX_METHODS,
     hostkeyAlgorithms: str = CHRONICLE_CONFIG_DEFAULT_HOSTKEYS, 
-    user: str = CHRONICLE_CONFIG_DEFAULT_USER):
-    
+    user: str = CHRONICLE_CONFIG_DEFAULT_USER,
+    _: None = Depends(E("Device '{deviceNickname}' could not be created")),
+    cdb: ChronicleDB =  Depends(safeDep(getCdb))
+):
+
     cdb.addDevice(
         deviceNickname=deviceNickname,
         deviceName=deviceName,
@@ -133,7 +152,7 @@ def create_device(
         (200, "Device modified successfully."),
     )
 )
-@responseExceptionHandler("Device could not be modified")
+@responseExceptionHandler()
 def modify_device(
     response: Response,
     deviceNickname: str,
@@ -145,7 +164,10 @@ def modify_device(
     sshVerbosity: int | None = None,
     kexMethods: str | None = None,
     hostkeyAlgorithms: str | None = None, 
-    user: str | None = None):
+    user: str | None = None,
+    _: None = Depends(E("Device '{deviceNickname}' could not be modified")),
+    cdb: ChronicleDB =  Depends(safeDep(getCdb))
+):
     
     cdb.modifyDevice(
         deviceNickname=deviceNickname,
