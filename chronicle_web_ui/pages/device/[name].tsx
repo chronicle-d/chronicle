@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-const API_BASE = 'http://127.0.0.1:5000/api';
+const API_BASE = 'http://127.0.0.1:8000';
 
 export default function DevicePage() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function DevicePage() {
 
   const fetchDevice = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/getDevice`, { params: { name } });
+      const res = await axios.get(`${API_BASE}/devices/${name}`);
       if (res.data.success) {
         const fullData = { ...res.data.data.device, ...res.data.data.ssh };
         setDevice(fullData);
@@ -49,17 +49,16 @@ export default function DevicePage() {
   const fetchConfig = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_BASE}/getDeviceConfig`, { params: { name } });
+      const res = await axios.get(`${API_BASE}/devices/${name}/config`);
       if (res.data.success) {
         setConfig(res.data.data.config);
         setToast({ type: 'success', msg: 'Configuration fetched successfully' });
       } else {
-        const err = res.data?.data?.error;
-        const msg = err?.codeMessage || res.data.message || 'Error fetching config';
+        const msg = res.data.description || 'Error fetching config';
         setToast({ type: 'error', msg });
       }
     } catch (e) {
-      const msg = e?.response?.data?.error?.codeMessage || 'Failed to fetch configuration';
+      const msg = e?.response?.data?.description || 'Failed to fetch configuration';
       setToast({ type: 'error', msg });
     } finally {
       setLoading(false);
@@ -68,7 +67,7 @@ export default function DevicePage() {
 
   const saveChanges = async () => {
     try {
-      await axios.post(`${API_BASE}/manageDevice?action=modify`, null, { params: form });
+      await axios.post(`${API_BASE}/devices/modify/${name}`, null, { params: form });
       setToast({ type: 'success', msg: 'Device updated successfully' });
       setEditing(false);
       fetchDevice();
@@ -167,7 +166,7 @@ export default function DevicePage() {
           {config && (
             <div className="mt-6 bg-gray-100 rounded p-4 overflow-auto max-h-[500px] border">
               <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800">
-                {config.join('\n')}
+                {Array.isArray(config) ? config.join('\n') : config}
               </pre>
             </div>
           )}

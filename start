@@ -26,26 +26,75 @@ ANSI_REVERSED_VIDEO="\e[7m"
 ANSI_STRIKETHROUGH="\e[9m"
 ANSI_END="\e[0m"
 
-echo -e " ${ANSI_BOLD}${ANSI_UNDERLINE}${ANSI_ITALIAN}${ANSI_BLUE}Chronicle:${ANSI_END}\n"
+echo -e "\n
+${ANSI_BOLD}════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════${ANSI_END}
+${ANSI_BOLD}${ANSI_BLUE}
+                                                                                          ▒▒            
+                                                                      ░░    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▒▒          
+                                                                      ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒        
+                                                                      ▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓  ▒▒▒▒        
+                                                  ████                ▒▒▒▒    ░░        ▓▓▓▓▒▒▒▒▓▓      
+                                                    ██                ▒▒▒▒▓▓▓▓░░▓▓░░▓▓░░░░░░    ▒▒      
+                                                                      ▒▒░░░░░░░░░░▓▓░░░░░░░░░░░░░░      
+                                                                        ░░░░░░░░░░░░░░░░░░░░░░░░░░      
+                                                                      ░░░░░░░░░░░░░░░░░░░░░░░░░░        
+                                  ▒▒▓▓▓▓                                ░░░░░░░░░░░░░░░░░░░░░░          
+                                ▓▓▓▓▓▓▓▓                              ▓▓▓▓▒▒░░░░░░░░░░░░░░▒▒▓▓          
+                                ▓▓▓▓▓▓▓▓        ░░                  ░░▒▒▓▓▓▓░░▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒▒          
+                                ▓▓▓▓▓▓▓▓▒▒  ▒▒▒▒▒▒▒▒                ▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒░░▓▓▓▓▒▒▒▒          
+                                ▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓  ▒▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+                                  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░▒▒▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+                                  ▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▒▒▒▒▓▓▒▒░░▒▒░░  ▓▓▒▒▒▒▒▒▓▓▓▓▒▒▒▒          
+                                    ▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒▓▓▒▒▒▒▒▒▓▓▓▓░░░░▒▒            
+                                    ▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▒▒▓▓░░▒▒            
+                                      ▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒              
+                                      ▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒▒▒                
+                                          ▒▒▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░▒▒▒▒▒▒░░░░                  
+                          ▓▓                  ▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░▒▒▒▒░░░░                    
+                          ▓▓▓▓                    ▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒░░                        
+                          ▒▒▓▓▓▓▓▓                ▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░                          
+                            ▓▓▓▓▓▓▓▓▒▒        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░                              
+                            ░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                                    
+                                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                                            
+                                    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒                                                
+
+
+
+
+                        ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗     ███████╗
+                        ██╔════╝██║  ██║██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║     ██╔════╝
+                        ██║     ███████║██████╔╝██║   ██║██╔██╗ ██║██║██║     ██║     █████╗  
+                        ██║     ██╔══██║██╔══██╗██║   ██║██║╚██╗██║██║██║     ██║     ██╔══╝  
+                        ╚██████╗██║  ██║██║  ██║╚██████╔╝██║ ╚████║██║╚██████╗███████╗███████╗
+                        ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝╚══════╝╚══════╝
+
+${ANSI_END}
+${ANSI_BOLD}════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════${ANSI_END}\n"
 
 function inform {
   TYPE="$1"
   shift
   case "$TYPE" in
-    0)
-      echo -e "${ANSI_BOLD}${ANSI_CYAN}[-]${ANSI_END} $*"
-      ;;
-    1)
-      echo -e "${ANSI_BOLD}${ANSI_BROWN}[*]${ANSI_END} $*"
-      ;;
-    2)
-      echo -e "${ANSI_BOLD}${ANSI_RED}[!]${ANSI_END} $*"
-      ;;
+  0)
+    echo -e " ${ANSI_BOLD}${ANSI_CYAN}[-]${ANSI_END} ${ANSI_BOLD}[SERVICE_]:${ANSI_END} $*"
+    ;;
+  1)
+    echo -e " ${ANSI_BOLD}${ANSI_BROWN}[*]${ANSI_END} ${ANSI_BOLD}[SERVICE_]:${ANSI_END} $*"
+    ;;
+  2)
+    echo -e " ${ANSI_BOLD}${ANSI_RED}[!]${ANSI_END} ${ANSI_BOLD}[SERVICE_]:${ANSI_END} $*"
+    ;;
   esac
 }
 
+inform 0 "${1:-4} workers available."
+
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/home/noam/Work_spaces/Personal/chronicle
+
 set -euo pipefail
+stty -echoctl
+
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 CHRONICLE_WEB_UI="${SCRIPT_DIR}/chronicle_web_ui"
 CHRONICLE_BASE="${SCRIPT_DIR}/chronicle_base"
@@ -66,8 +115,8 @@ command -v npm >/dev/null || {
   inform 2 "npm not found"
   exit 1
 }
-command -v flask >/dev/null || {
-  inform 2 "flask not found"
+command -v uvicorn >/dev/null || {
+  inform 2 "uvicorn not found"
   exit 1
 }
 
@@ -75,10 +124,12 @@ command -v flask >/dev/null || {
 cleanup() {
   if $serviceUp; then
     serviceUp=false
-    inform 0 "Shutting down..."
+    stty echoctl
+    inform 1 "Stopping all workers..."
     pkill -P $$ || true # Kill all child processes of this script
     wait
     inform 0 "All processes terminated."
+    echo -e "\n${ANSI_BOLD}════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════${ANSI_END}\n"
   fi
 }
 
@@ -86,45 +137,26 @@ cleanup() {
 trap cleanup SIGINT SIGTERM EXIT
 
 # Start processes
-
 inform 0 "Starting npm development server..."
-npm --prefix "$CHRONICLE_WEB_UI" run dev &>/dev/null &
+npm --prefix "$CHRONICLE_WEB_UI" run dev >/dev/null &
 npm_pid=$!
-#sleep 1
+sleep 0.1
 if ! kill -0 "$npm_pid" 2>/dev/null; then
   inform 2 "Failed to start npm dev server."
   cleanup
   exit 1
 fi
 
-inform 0 "Starting Flask server..."
-flask --app "${CHRONICLE_BASE}/API" run >/dev/null &
-flask_pid=$!
+inform 0 "Starting uvicorn server..."
+uvicorn chronicle_base.main:app --workers "${1:-4}" --log-config "${CHRONICLE_BASE}/uvicorn_log_config.yaml" &
+uvicorn_pid=$!
 sleep 1
-if ! kill -0 "$flask_pid" 2>/dev/null; then
-  inform 2 "Failed to start Flask server."
+if ! kill -0 "$uvicorn_pid" 2>/dev/null; then
+  inform 2 "Failed to start uvicorn server."
   cleanup
   exit 1
 fi
 
-sleep 1
+inform 0 "Serving Chronicle at: ${ANSI_BOLD}${ANSI_CYAN}${ANSI_UNDERLINE}http://localhost:3000/${ANSI_END}"
 
-clear
-
-echo -e "${ANSI_BOLD} • Serving Chronicle at:${ANSI_END} ${ANSI_BOLD}${ANSI_CYAN}http://localhost:3000/${ANSI_END}\n"
-
-while $serviceUp; do
-  echo -en "  ${ANSI_BOLD}>${ANSI_END} "
-  read CMDLINE
-
-  if [ "${CMDLINE}" == "quit" ]; then
-    echo
-    cleanup
-  elif [ -n "${CMDLINE}" ]; then
-    ./ChronicleCLI -C ${CMDLINE}
-    echo
-  fi
-done
-
-# Wait for background jobs
 wait
