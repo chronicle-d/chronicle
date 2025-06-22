@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# Tests
+test/
+
 # C++ build and binary outputs
 chronicle_core/build/
 chronicle_core/bin/

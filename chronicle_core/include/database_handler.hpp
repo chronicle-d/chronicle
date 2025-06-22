@@ -15,6 +15,7 @@ class ChronicleDB {
     struct MongoProjections {
       static const bsoncxx::document::view_or_value device();
       static const bsoncxx::document::view_or_value settings();
+      static const bsoncxx::document::view_or_value users();
     };
 
     /* Global */
@@ -64,6 +65,18 @@ class ChronicleDB {
     void deleteDevice(const std::string& deviceNickname) const;
     std::vector<std::string> listDevices() const;
     std::string getDevice(const std::string& deviceNickname) const;
+
+    // Users
+    void addUser(const std::string& username, const std::string& password, bool connected) const;
+    void modifyUser(
+      const std::string& username,
+      std::optional<std::string> password,
+      std::optional<bool> connected
+    ) const;
+    void deleteUser(const std::string& username) const;
+    std::vector<std::string> listUsers() const;
+    std::string getUser(const std::string& username) const;
+
 
     // C++ Internal methods
     bsoncxx::document::value getDeviceBson(const std::string& deviceNickname) const;
