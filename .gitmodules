@@ -1,0 +1,9 @@
+[submodule "chronicle_base"]
+	path = chronicle_base
+	url = git@github.com:chronicle-d/chronicle_base.git
+[submodule "chronicle_web_ui"]
+	path = chronicle_web_ui
+	url = git@github.com:chronicle-d/chronicle_web_ui.git
+[submodule "chronicle_core"]
+	path = chronicle_core
+	url = git@github.com:chronicle-d/chronicle_core.git
