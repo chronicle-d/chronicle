@@ -91,6 +91,7 @@ inform 0 "${1:-4} workers available."
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=/home/noam/Work_spaces/Personal/chronicle
+export PYTHONPATH="$(realpath chronicle_core/bin):$PYTHONPATH"
 
 set -euo pipefail
 stty -echoctl
